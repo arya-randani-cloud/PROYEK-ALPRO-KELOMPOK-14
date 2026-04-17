@@ -1,0 +1,121 @@
+#include <iostream>
+using namespace std;
+
+class ECommerce {
+private:
+    string namaKeranjang[100];
+    int hargaKeranjang[100];
+    int jumlahItem = 0;
+
+public:
+    void tambahKeKeranjang(string nama, int harga) {
+        namaKeranjang[jumlahItem] = nama;
+        hargaKeranjang[jumlahItem] = harga;
+        jumlahItem++;
+        cout << ">> Produk masuk ke keranjang!\n";
+    }
+
+    void tampilStruk() {
+        cout << "\n=== STRUK PEMBELIAN ===\n";
+        int total = 0;
+
+        for (int i = 0; i < jumlahItem; i++) {
+            cout << i+1 << ". " << namaKeranjang[i]
+                 << " - Rp" << hargaKeranjang[i] << endl;
+            total += hargaKeranjang[i];
+        }
+
+        cout << "------------------------\n";
+        cout << "TOTAL: Rp" << total << endl;
+    }
+
+    void tampilMenu() {
+        int pilihanKategori;
+
+        do {
+            cout << "\n=== MENU KATEGORI ===\n";
+            cout << "1. Sembako\n";
+            cout << "2. Rumah Tangga\n";
+            cout << "3. Gaming\n";
+            cout << "4. Sekolah\n";
+            cout << "0. Checkout\n";
+            cout << "Pilih: ";
+            cin >> pilihanKategori;
+
+            switch (pilihanKategori) {
+                case 1: menuSembako(); break;
+                case 2: menuRumah(); break;
+                case 3: menuGaming(); break;
+                case 4: menuSekolah(); break;
+                case 0: cout << "Checkout...\n"; break;
+                default: cout << "Tidak valid\n";
+            }
+
+        } while (pilihanKategori != 0);
+
+        tampilStruk();
+    }
+
+private:
+    void menuSembako() {
+        int p;
+        cout << "\n--- SEMBAKO ---\n";
+        cout << "1. Beras (12000)\n2. Gula (14000)\n3. Minyak (15000)\n0. Kembali\n";
+        cout << "Pilih: ";
+        cin >> p;
+
+        switch (p) {
+            case 1: tambahKeKeranjang("Beras", 12000); break;
+            case 2: tambahKeKeranjang("Gula", 14000); break;
+            case 3: tambahKeKeranjang("Minyak", 15000); break;
+        }
+    }
+
+    void menuRumah() {
+        int p;
+        cout << "\n--- RUMAH TANGGA ---\n";
+        cout << "1. Sapu (10000)\n2. Ember (25000)\n3. Piring (5000)\n0. Kembali\n";
+        cout << "Pilih: ";
+        cin >> p;
+
+        switch (p) {
+            case 1: tambahKeKeranjang("Sapu", 10000); break;
+            case 2: tambahKeKeranjang("Ember", 25000); break;
+            case 3: tambahKeKeranjang("Piring", 5000); break;
+        }
+    }
+
+    void menuGaming() {
+        int p;
+        cout << "\n--- GAMING ---\n";
+        cout << "1. Mouse (150000)\n2. Keyboard (300000)\n3. Headset (200000)\n0. Kembali\n";
+        cout << "Pilih: ";
+        cin >> p;
+
+        switch (p) {
+            case 1: tambahKeKeranjang("Mouse Gaming", 150000); break;
+            case 2: tambahKeKeranjang("Keyboard Gaming", 300000); break;
+            case 3: tambahKeKeranjang("Headset", 200000); break;
+        }
+    }
+
+    void menuSekolah() {
+        int p;
+        cout << "\n--- SEKOLAH ---\n";
+        cout << "1. Buku (5000)\n2. Pulpen (3000)\n3. Pensil (2000)\n0. Kembali\n";
+        cout << "Pilih: ";
+        cin >> p;
+
+        switch (p) {
+            case 1: tambahKeKeranjang("Buku", 5000); break;
+            case 2: tambahKeKeranjang("Pulpen", 3000); break;
+            case 3: tambahKeKeranjang("Pensil", 2000); break;
+        }
+    }
+};
+
+int main() {
+    ECommerce toko;
+    toko.tampilMenu();
+    return 0;
+}
