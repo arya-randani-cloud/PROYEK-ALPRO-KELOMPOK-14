@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Struktur data untuk menyimpan informasi produk
 struct Produk {
     int id;
     string nama;
@@ -14,7 +13,6 @@ struct Produk {
     int stok;
 };
 
-// Fungsi untuk menampilkan semua produk dalam bentuk tabel
 void tampilkanKatalog(const vector<Produk>& katalog) {
     if (katalog.empty()) {
         cout << "\n=========================================\n";
@@ -43,13 +41,11 @@ void tampilkanKatalog(const vector<Produk>& katalog) {
     cout << "======================================================================\n";
 }
 
-// Fungsi untuk mencari produk berdasarkan nama
 void cariProduk(const vector<Produk>& katalog, string namaCari) {
     bool ditemukan = false;
     cout << "\nHasil pencarian untuk '" << namaCari << "':\n";
     
     for (const auto& p : katalog) {
-        // Mengubah ke huruf kecil atau pencarian substring sederhana
         if (p.nama.find(namaCari) != string::npos) {
             if (!ditemukan) {
                 cout << left << setw(5) << "ID" << setw(20) << "Nama" << setw(15) << "Harga" << endl;
@@ -68,9 +64,9 @@ void cariProduk(const vector<Produk>& katalog, string namaCari) {
 int main() {
     vector<Produk> katalog;
     int pilihan;
-    int counterId = 1; // Untuk generate ID otomatis
+    int counterId = 1; // Untuk generate ID
 
-    // Data awal (Opsional, biar katalog tidak kosong saat pertama dijalankan)
+    // Data awal
     katalog.push_back({counterId++, "Laptop Asus", "Elektronik", 8500000, 10});
     katalog.push_back({counterId++, "Mouse Logitech", "Elektronik", 150000, 25});
     katalog.push_back({counterId++, "Kemeja Polos", "Pakaian", 125000, 50});
@@ -84,7 +80,7 @@ int main() {
         cout << "Pilih menu (1-4): ";
         cin >> pilihan;
 
-        // Validasi input menu
+        
         if(cin.fail()) {
             cin.clear();
             cin.ignore(1000, '\n');
