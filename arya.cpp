@@ -155,7 +155,7 @@ public:
     void isiSaldo(double jumlah) {
         if (jumlah > 0) {
             saldoWallet += jumlah;
-            cout << "Berhasil Top Up! Saldo Anda sekarang: Rp" << saldoWallet << "\n";
+            cout << "Berhasil Top Up! Saldo Anda sekarang: Rp" << fixed << setprecision(0) << saldoWallet << "\n";
         }
     }
 
@@ -329,7 +329,7 @@ int main() {
     int pilihanMenu;
     do {
         cout << "\n=========================================\n";
-        cout << "       WELCOME TO CERAN_HUB MALL         \n";
+        cout << "        WELCOME TO CERAN_HUB MALL        \n";
         cout << "=========================================\n";
         cout << "Loged in as: " << userSekarang.nama << "\n";
         cout << "1. Lihat Profil & Fitur Dompet Digital (Wallet)\n";
@@ -418,6 +418,67 @@ int main() {
             double totalAkhir = totalBelanja + pajak;
 
             cout << "\n--- KONFIRMASI PEMBAYARAN ---\n";
-            cout << "Total Belanja : Rp" << totalBelanja << "\n";
+            cout << "Total Belanja : Rp" << fixed << setprecision(0) << totalBelanja << "\n";
             cout << "Pajak (PPN 11%): Rp" << pajak << "\n";
             cout << "Total Tagihan : Rp" << totalAkhir << "\n";
+            
+            cout << "Apakah Anda ingin melanjutkan pembayaran? (y/n): ";
+            char konfirmasi;
+            cin >> konfirmasi;
+            
+            if (konfirmasi == 'y' || konfirmasi == 'Y') {
+                if (userSekarang.saldoWallet >= totalAkhir) {
+                    userSekarang.kurangiSaldo(totalAkhir);
+                    totalSirkulasiFinansial += totalAkhir;
+                    
+                    // Cetak Struk Belanja Resmi
+                    cout << "\n=========================================\n";
+                    cout << "             STRUK PEMBAYARAN            \n";
+                    cout << "=========================================\n";
+                    WaktuTransaksi waktu;
+                    waktu.setWaktuSekarang();
+                    cout << "Waktu Transaksi : "; waktu.cetakWaktu();
+                    cout << "Nama Pelanggan  : " << userSekarang.nama << "\n";
+                    cout << "-----------------------------------------\n";
+                    for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i) {
+                        cout << userSekarang.keranjang[i].produk.namaProduk << " x" 
+                             << userSekarang.keranjang[i].kuantitas << " : Rp" 
+                             << fixed << setprecision(0) << userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas << "\n";
+                    }
+                    cout << "-----------------------------------------\n";
+                    cout << "Subtotal        : Rp" << totalBelanja << "\n";
+                    cout << "PPN (11%)       : Rp" << pajak << "\n";
+                    cout << "Total Bayar     : Rp" << totalAkhir << "\n";
+                    cout << "Sisa Saldo      : Rp" << userSekarang.saldoWallet << "\n";
+                    cout << "=========================================\n";
+                    cout << "      Terima Kasih Telah Berbelanja!     \n";
+                    
+                    // Kosongkan keranjang setelah checkout sukses
+                    userSekarang.kosongkanKeranjang();
+                } else {
+                    cout << "X Saldo Wallet tidak mencukupi! Silakan Top Up terlebih dahulu.\n";
+                }
+            } else {
+                cout << "Transaksi dibatalkan.\n";
+            }
+        }
+        else if (pilihanMenu == 5) {
+            string kunci;
+            cout << "\nMasukkan Kunci Keamanan Admin: ";
+            cin >> kunci;
+            if (kunci == adminUtama.kunciKeamanan) {
+                adminUtama.pantauKeuangan(totalSirkulasiFinansial);
+            } else {
+                cout << "X Kunci Keamanan Salah! Akses Ditolak.\n";
+            }
+        }
+        else if (pilihanMenu == 6) {
+            cout << "\nTerima kasih telah berkunjung ke CERAN_HUB MALL!\n";
+        }
+        else {
+            cout << "X Pilihan menu tidak valid!\n";
+        }
+    } while (pilihanMenu != 6);
+
+    return 0;
+}
