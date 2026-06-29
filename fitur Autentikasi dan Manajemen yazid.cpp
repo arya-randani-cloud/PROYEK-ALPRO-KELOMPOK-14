@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <cstdlib> // Diperlukan untuk fungsi system("cls") atau system("clear")
 
 using namespace std;
 
@@ -31,7 +32,8 @@ vector<Produk> katalogProduk;
 vector<KeranjangItem> keranjangBelanja;
 User userLogin; 
 bool isLoggedIn = false;
-int counterId = 101; // ID produk otomatis dimulai dari 101
+bool sudahRegistrasi = false; // Penanda apakah sudah ada akun yang didaftarkan
+int counterId = 101; 
 
 // --- PROTOTIPE FUNGSI ---
 void inisialisasiDataAwal();
@@ -54,9 +56,6 @@ void cekAlamatUser();
 // --- MAIN FUNCTION ---
 int main() {
     inisialisasiDataAwal();
-    cout << "===========================================" << endl;
-    cout << "   SELAMAT DATANG DI SISTEM MANAJEMEN TOKO " << endl;
-    cout << "===========================================" << endl;
     
     while (true) {
         if (!isLoggedIn) {
@@ -68,12 +67,10 @@ int main() {
     return 0;
 }
 
-// Inisialisasi Data Awal (Termasuk 3 barang tambahan dari kamu)
 void inisialisasiDataAwal() {
     katalogProduk.push_back({counterId++, "Kopi Kenangan", "Minuman", 18000, 40});
     katalogProduk.push_back({counterId++, "Roti Cokelat", "Makanan", 12000, 25});
     katalogProduk.push_back({counterId++, "Susu Kotak UHT", "Minuman", 6500, 100});
-    // 3 List Barang Tambahan Baru
     katalogProduk.push_back({counterId++, "Laptop Asus", "Elektronik", 8500000, 10});
     katalogProduk.push_back({counterId++, "Mouse Logitech", "Elektronik", 150000, 25});
     katalogProduk.push_back({counterId++, "Kemeja Polos", "Pakaian", 125000, 50});
@@ -81,34 +78,65 @@ void inisialisasiDataAwal() {
 
 // --- 1. FITUR AUTENTIKASI ---
 void menuAutentikasi() {
+    // Membersihkan layar setiap kali menu akses ini dipanggil ulang
+    system("cls"); // Ubah ke "clear" jika kamu menggunakan Linux/Mac
+    
     int pilihan;
+    cout << "===========================================" << endl;
+    cout << "   SELAMAT DATANG DI SISTEM MANAJEMEN TOKO " << endl;
+    cout << "===========================================" << endl;
     cout << "\n[ MENU AKSES ]" << endl;
-    cout << "1. Registrasi Akun" << endl;
-    cout << "2. Login" << endl;
-    cout << "3. Keluar Aplikasi" << endl;
-    cout << "Pilih opsi (1-3): ";
-    cin >> pilihan;
+    
+    // Logika Kondisional: Jika BELUM registrasi, tampilkan menu Registrasi
+    if (!sudahRegistrasi) {
+        cout << "1. Registrasi Akun" << endl;
+        cout << "2. Login" << endl;
+        cout << "3. Keluar Aplikasi" << endl;
+        cout << "Pilih opsi (1-3): ";
+        cin >> pilihan;
 
-    if (cin.fail()) {
-        cin.clear();
-        cin.ignore(1000, '\n');
-        cout << "[!] Input salah! Masukkan angka menu.\n";
-        return;
-    }
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            return;
+        }
 
-    switch (pilihan) {
-        case 1: registrasi(); break;
-        case 2: login(); break;
-        case 3: 
-            cout << "\nTerima kasih telah menggunakan aplikasi ini!" << endl;
-            exit(0);
-        default: cout << "[!] Pilihan tidak valid!" << endl;
+        switch (pilihan) {
+            case 1: registrasi(); break;
+            case 2: login(); break;
+            case 3: 
+                cout << "\nTerima kasih telah menggunakan aplikasi ini!" << endl;
+                exit(0);
+            default: break;
+        }
+    } 
+    // Jika SUDAH registrasi, sembunyikan menu 1 (Registrasi)
+    else {
+        cout << "1. Login" << endl;
+        cout << "2. Keluar Aplikasi" << endl;
+        cout << "Pilih opsi (1-2): ";
+        cin >> pilihan;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            return;
+        }
+
+        switch (pilihan) {
+            case 1: login(); break;
+            case 2: 
+                cout << "\nTerima kasih telah menggunakan aplikasi ini!" << endl;
+                exit(0);
+            default: break;
+        }
     }
 }
 
 void registrasi() {
+    system("cls"); // Bersihkan layar menu utama untuk masuk ke form registrasi
     User userBaru;
-    cout << "\n--- REGISTRASI AKUN ---" << endl;
+    cout << "--- REGISTRASI AKUN ---" << endl;
     cout << "Masukkan Username: ";
     cin >> userBaru.username;
     cout << "Masukkan Password: ";
@@ -118,12 +146,16 @@ void registrasi() {
     getline(cin, userBaru.alamat);
 
     databaseUser.push_back(userBaru);
-    cout << "[Sukses] Registrasi Berhasil! Silakan Login." << endl;
+    sudahRegistrasi = true; // Set true agar menu registrasi hilang setelah ini
+    
+    cout << "\n[Sukses] Registrasi Berhasil! Tekan Enter untuk lanjut ke halaman Login...";
+    cin.get(); // Menahan layar sampai user menekan enter
 }
 
 void login() {
+    system("cls"); // Bersihkan layar menu utama untuk masuk ke form login
     string uname, pword;
-    cout << "\n--- LOGIN USER ---" << endl;
+    cout << "--- LOGIN USER ---" << endl;
     cout << "Username: ";
     cin >> uname;
     cout << "Password: ";
@@ -133,17 +165,22 @@ void login() {
         if (u.username == uname && u.password == pword) {
             userLogin = u;
             isLoggedIn = true;
-            cout << "[Sukses] Login Berhasil! Selamat datang, " << userLogin.username << "." << endl;
+            
+            system("cls"); // Bersihkan form login sebelum masuk ke Menu Utama toko
+            cout << "[Sukses] Login Berhasil! Selamat datang, " << userLogin.username << ".\n" << endl;
             return;
         }
     }
-    cout << "[!] Username atau Password salah! Coba lagi atau registrasi terlebih dahulu." << endl;
+    cout << "\n[!] Username atau Password salah! Tekan Enter untuk kembali...";
+    cin.ignore();
+    cin.get();
 }
 
 // --- 2. FITUR KATALOG & TAMPILAN UTAMA ---
+// Setelah masuk ke sini, cout akan menurun ke bawah secara normal seperti biasa
 void menuUtama() {
     int pilihan;
-    cout << "\n=========================================" << endl;
+    cout << "=========================================" << endl;
     cout << "               MENU UTAMA                " << endl;
     cout << "=========================================" << endl;
     cout << "1. Tampilkan Katalog Produk\n";
@@ -152,14 +189,14 @@ void menuUtama() {
     cout << "4. Lihat Keranjang & Checkout\n";
     cout << "5. Panel Dashboard Admin (Manajemen Toko)\n";
     cout << "6. Logout\n";
-    cout << "-----------------------------------------" << endl;
+    cout << "-----------------------------------------\n";
     cout << "Pilih menu (1-6): ";
     cin >> pilihan;
 
     if (cin.fail()) {
         cin.clear();
         cin.ignore(1000, '\n');
-        cout << "[!] Input salah! Masukkan angka menu.\n";
+        cout << "[!] Input salah! Masukkan angka menu.\n\n";
         return;
     }
 
@@ -171,16 +208,16 @@ void menuUtama() {
         case 5: menuManajemenToko(); break;
         case 6: 
             isLoggedIn = false;
+            sudahRegistrasi = false; // Mengembalikan menu registrasi saat logout agar bisa dipakai user lain jika mau
             keranjangBelanja.clear();
-            cout << "[Sukses] Berhasil logout." << endl;
             break;
-        default: cout << "[!] Pilihan tidak valid!" << endl;
+        default: cout << "[!] Pilihan tidak valid!\n\n";
     }
 }
 
 void tampilkanKatalog() {
     if (katalogProduk.empty()) {
-        cout << "\n[!] Katalog toko masih kosong!\n";
+        cout << "\n[!] Katalog toko masih kosong!\n\n";
         return;
     }
 
@@ -201,7 +238,7 @@ void tampilkanKatalog() {
              << "Rp " << setw(12) << fixed << setprecision(0) << p.harga 
              << setw(10) << p.stok << endl;
     }
-    cout << "======================================================================\n";
+    cout << "======================================================================\n\n";
 }
 
 void cariProduk() {
@@ -225,15 +262,14 @@ void cariProduk() {
         }
     }
     
-    if (!ditemukan) cout << "[!] Produk '" << namaCari << "' tidak ditemukan.\n";
-    else cout << "----------------------------------------------------------------------\n";
+    if (!ditemukan) cout << "[!] Produk '" << namaCari << "' tidak ditemukan.\n\n";
+    else cout << "----------------------------------------------------------------------\n\n";
 }
 
-// --- 3. FITUR KERANJANG, CHECKOUT, & PENGECEKAN BARANG ---
 void tambahKeKeranjang() {
     int idCari, jumlahBeli;
     tampilkanKatalog();
-    cout << "\nMasukkan ID Produk yang ingin dibeli: ";
+    cout << "Masukkan ID Produk yang ingin dibeli: ";
     cin >> idCari;
     cout << "Masukkan Jumlah: ";
     cin >> jumlahBeli;
@@ -242,21 +278,21 @@ void tambahKeKeranjang() {
         if (p.id == idCari) {
             if (p.stok >= jumlahBeli) {
                 keranjangBelanja.push_back({p, jumlahBeli});
-                p.stok -= jumlahBeli; // Otomatis mengurangi stok berjalan
-                cout << "[Sukses] Barang berhasil dimasukkan ke keranjang!" << endl;
+                p.stok -= jumlahBeli; 
+                cout << "[Sukses] Barang berhasil dimasukkan ke keranjang!\n\n";
                 return;
             } else {
-                cout << "[!] Stok tidak mencukupi! Stok tersisa: " << p.stok << endl;
+                cout << "[!] Stok tidak mencukupi! Stok tersisa: " << p.stok << "\n\n";
                 return;
             }
         }
     }
-    cout << "[!] Produk dengan ID tersebut tidak ditemukan." << endl;
+    cout << "[!] Produk dengan ID tersebut tidak ditemukan.\n\n";
 }
 
 void lihatKeranjangDanCheckout() {
     if (keranjangBelanja.empty()) {
-        cout << "\n[!] Keranjang belanja Anda masih kosong." << endl;
+        cout << "\n[!] Keranjang belanja Anda masih kosong.\n\n";
         return;
     }
 
@@ -280,15 +316,14 @@ void lihatKeranjangDanCheckout() {
     cin >> konfirmasi;
 
     if (konfirmasi == 'y' || konfirmasi == 'Y') {
-        cout << "\n[Sukses] Checkout Berhasil! Pengiriman akan ditujukan ke alamat Anda.\n";
+        cout << "\n[Sukses] Checkout Berhasil!\n";
         cekAlamatUser();
         keranjangBelanja.clear(); 
     } else {
-        cout << "Checkout dibatalkan." << endl;
+        cout << "Checkout dibatalkan.\n\n";
     }
 }
 
-// --- 4. FITUR KHUSUS DASHBOARD ADMIN / MANAJEMEN TOKO ---
 void menuManajemenToko() {
     int pilihan;
     do {
@@ -343,7 +378,7 @@ void tambahProdukBaru() {
 void updateStokMasuk() {
     int idCari, tambahStok;
     tampilkanKatalog();
-    cout << "\nMasukkan ID Produk untuk UPDATE PEMASUKAN (Restock): ";
+    cout << "Masukkan ID Produk untuk UPDATE PEMASUKAN (Restock): ";
     cin >> idCari;
 
     for (auto& p : katalogProduk) {
@@ -356,13 +391,13 @@ void updateStokMasuk() {
             return;
         }
     }
-    cout << "[!] Produk tidak ditemukan.\n";
+    cout << "[!] Produk tidak ditemukan.\n\n";
 }
 
 void updateStokKeluar() {
     int idCari, kurangStok;
     tampilkanKatalog();
-    cout << "\nMasukkan ID Produk untuk UPDATE PENGELUARAN manual: ";
+    cout << "Masukkan ID Produk untuk UPDATE PENGELUARAN manual: ";
     cin >> idCari;
 
     for (auto& p : katalogProduk) {
@@ -379,26 +414,26 @@ void updateStokKeluar() {
             return;
         }
     }
-    cout << "[!] Produk tidak ditemukan.\n";
+    cout << "[!] Produk tidak ditemukan.\n\n";
 }
 
 void hapusProduk() {
     int idHapus;
     bool ditemukan = false;
     tampilkanKatalog();
-    cout << "\nMasukkan ID Produk yang ingin dihapus dari Toko: ";
+    cout << "Masukkan ID Produk yang ingin dihapus dari Toko: ";
     cin >> idHapus;
 
     for (auto it = katalogProduk.begin(); it != katalogProduk.end(); ++it) {
         if (it->id == idHapus) {
             cout << "[Peringatan] Menghapus '" << it->nama << "' dari sistem...\n";
             katalogProduk.erase(it);
-            cout << "[Sukses] Produk telah berhasil dihapus.\n";
+            cout << "[Sukses] Produk telah berhasil dihapus.\n\n";
             ditemukan = true;
             break;
         }
     }
-    if (!ditemukan) cout << "[!] Produk dengan ID " << idHapus << " tidak ditemukan.\n";
+    if (!ditemukan) cout << "[!] Produk dengan ID " << idHapus << " tidak ditemukan.\n\n";
 }
 
 void hitungTotalAset() {
@@ -416,7 +451,7 @@ void hitungTotalAset() {
     cout << " Total Jenis Produk : " << katalogProduk.size() << " jenis\n";
     cout << " Total Stok Barang  : " << totalBarang << " pcs\n";
     cout << " Total Nilai Aset   : Rp " << fixed << setprecision(0) << totalAset << endl;
-    cout << "=========================================\n";
+    cout << "=========================================\n\n";
 }
 
 void cekAlamatUser() {
