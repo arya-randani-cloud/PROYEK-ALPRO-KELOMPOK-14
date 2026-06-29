@@ -13,7 +13,6 @@ struct Produk {
     int stok;
 };
 
-// Fungsi menampilkan katalog
 void tampilkanKatalog(const vector<Produk>& katalog) {
     if (katalog.empty()) {
         cout << "\n[!] Katalog toko masih kosong!\n";
@@ -40,7 +39,6 @@ void tampilkanKatalog(const vector<Produk>& katalog) {
     cout << "======================================================================\n";
 }
 
-// Fungsi Ringkasan Keuangan / Aset Toko
 void hitungTotalAset(const vector<Produk>& katalog) {
     double totalAset = 0;
     int totalBarang = 0;
@@ -64,7 +62,6 @@ int main() {
     int pilihan;
     int counterId = 101; // ID dimulai dari 101 agar terlihat rapi
 
-    // Data Awal Toko
     katalog.push_back({counterId++, "Kopi Kenangan", "Minuman", 18000, 40});
     katalog.push_back({counterId++, "Roti Cokelat", "Makanan", 12000, 25});
     katalog.push_back({counterId++, "Susu Kotak UHT", "Minuman", 6500, 100});
@@ -119,7 +116,7 @@ int main() {
                         cout << "Produk Ditemukan: " << p.nama << " (Stok Saat Ini: " << p.stok << ")\n";
                         cout << "Masukkan Jumlah Stok Tambahan: ";
                         cin >> stokBaru;
-                        p.stok += stokBaru; // Menambahkan stok lama dengan yang baru
+                        p.stok += stokBaru; // Menambahkan stok lama dgn yg baru
                         cout << "\n[Sukses] Stok " << p.nama << " berhasil diperbarui menjadi " << p.stok << " pcs.\n";
                         ditemukan = true;
                         break;
