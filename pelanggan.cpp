@@ -159,6 +159,18 @@ public:
         }
     }
 
+    // MEMASTIKAN FUNGSI INI TERDEFINISI DENGAN BENAR DI DALAM CLASS
+    void tambahKeranjang(Produk p, int qty) {
+        if (jumlahItemKeranjang < MAKS_KERANJANG) {
+            keranjang[jumlahItemKeranjang].produk = p;
+            keranjang[jumlahItemKeranjang].kuantitas = qty;
+            jumlahItemKeranjang++;
+            cout << "-> " << p.namaProduk << " (" << qty << " pcs) dimasukkan ke keranjang.\n";
+        } else {
+            cout << "Keranjang penuh!\n";
+        }
+    }
+
     void kurangiSaldo(double jumlah) {
         saldoWallet -= jumlah;
     }
@@ -203,7 +215,6 @@ int main() {
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P01", "Kemeja Flanel", 20, 399000));
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P02", "AIRism T-Shirt", 50, 199000));
 
-    // Kode ditambahkan di sini, sisa inisialisasi awal tetap dipertahankan
     daftarTokoMall[totalToko++] = Toko("T02", "H&M", "Fashion, Pakaian & Department Store (Trendi & Aksesoris)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P03", "Hoodie Regular", 15, 449000));
 
@@ -245,7 +256,6 @@ int main() {
     daftarTokoMall[totalToko++] = Toko("T14", "Samsung Store / Xiaomi Store", "Gadget, Elektronik & Kamera");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P15", "Smart Ecosystem TV", 5, 4500000));
 
-    // Metode pembayaran e-wallet seperti gopay dana paypal shopeepay qris indomaret alfamart bank va
     daftarTokoMall[totalToko++] = Toko("T15", "Bli-Bli Tukar Tambah", "Gadget, Elektronik & Kamera (Layanan TT)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P16", "Voucher Tukar Tambah", 100, 500000));
 
@@ -358,7 +368,7 @@ int main() {
                     
                     int statusProses = 1; 
                     switch (mTopUp) {
-                        case 1:
+                        case 1: {
                             cout << "\n[BANK VIRTUAL ACCOUNT]\n";
                             cout << "Pilih Bank:\n1. BRI\n2. BCA\n3. Mandiri\n4. BNI\nPilihan Bank: ";
                             int subBank;
@@ -371,45 +381,52 @@ int main() {
                                 default: cout << "Bank tidak tersedia.\n"; statusProses = 0; break;
                             }
                             break;
-                        case 2:
+                        }
+                        case 2: {
                             cout << "\n[GERAI INDOMARET]\n";
                             cout << "Kode Pembayaran Indomaret: IDM" << userSekarang.nik.substr(2, 6) << "\n";
                             cout << "Silakan tunjukkan kode ini ke kasir Indomaret terdekat.\n";
                             break;
-                        case 3:
+                        }
+                        case 3: {
                             cout << "\n[GERAI ALFAMART]\n";
                             cout << "Kode Pembayaran Alfamart: ALFA" << userSekarang.nik.substr(1, 6) << "\n";
                             cout << "Silakan tunjukkan kode ini ke kasir Alfamart terdekat.\n";
                             break;
-                        case 4:
+                        }
+                        case 4: {
                             cout << "\n[E-WALLET GOPAY]\n";
                             cout << "Menghubungkan ke aplikasi Gojek...\n";
                             cout << "Masukkan Nomor HP GoPay Anda: ";
-                            char noGopay[20]; cin >> noGopay;
+                            string noGopay; cin >> noGopay;
                             cout << "Permintaan bayar dikirim ke aplikasi Anda.\n";
                             break;
-                        case 5:
+                        }
+                        case 5: {
                             cout << "\n[E-WALLET DANA]\n";
                             cout << "Membuka gerbang pembayaran DANA...\n";
                             cout << "Masukkan Nomor ID DANA Anda: ";
-                            char noDana[20]; cin >> noDana;
+                            string noDana; cin >> noDana;
                             cout << "Silakan konfirmasi PIN pada pop-up smartphone Anda.\n";
                             break;
-                        case 6:
+                        }
+                        case 6: {
                             cout << "\n[PAYPAL GLOBAL PAYMENT]\n";
                             cout << "Kurs konversi otomatis diterapkan ke USD.\n";
                             cout << "Masukkan Email PayPal Anda: ";
-                            char emailPaypal[40]; cin >> emailPaypal;
+                            string emailPaypal; cin >> emailPaypal;
                             cout << "Otentikasi tagihan internasional berhasil.\n";
                             break;
-                        case 7:
+                        }
+                        case 7: {
                             cout << "\n[E-WALLET SHOPEEPAY]\n";
                             cout << "Membuka Aplikasi Shopee...\n";
                             cout << "Masukkan Username Shopee: ";
-                            char userShopee[30]; cin >> userShopee;
+                            string userShopee; cin >> userShopee;
                             cout << "Notifikasi tagihan telah dikirim ke akun ShopeePay Anda.\n";
                             break;
-                        case 8:
+                        }
+                        case 8: {
                             cout << "\n[QRIS - AUTOMATIC SCANNER]\n";
                             cout << "###########################\n";
                             cout << "##   [QRIS BARCODE SCAN] ##\n";
@@ -417,14 +434,16 @@ int main() {
                             cout << "###########################\n";
                             cout << "Silakan scan kode QR di atas menggunakan aplikasi finansial Anda.\n";
                             break;
-                        default:
+                        }
+                        default: {
                             cout << "Pilihan metode top up tidak valid!\n";
                             statusProses = 0;
                             break;
+                        }
                     }
                     
                     switch (statusProses) {
-                        case 1:
+                        case 1: {
                             cout << "Tekan 1 untuk menyelesaikan proses verifikasi pembayaran: ";
                             int verif; cin >> verif;
                             switch (verif) {
@@ -436,7 +455,7 @@ int main() {
                                     break;
                             }
                             break;
-                        case 0:
+                        }
                         default:
                             break;
                     }
@@ -514,7 +533,7 @@ int main() {
                 cout << "Pajak (PPN 11%): Rp" << pajak << "\n";
                 cout << "Total Tagihan : Rp" << totalAkhir << "\n";
                 
-                cout << "\nPILIK METODE PEMBAYARAN TRANSAKSI:\n";
+                cout << "\nPILIH METODE PEMBAYARAN TRANSAKSI:\n";
                 cout << "1. Bayar Menggunakan Saldo Digital Wallet Terintegrasi\n";
                 cout << "2. Direct Bank Virtual Account (VA)\n";
                 cout << "3. Direct Over-The-Counter Indomaret\n";
@@ -532,7 +551,7 @@ int main() {
                 string labelMetode = "";
 
                 switch (metodeBayar) {
-                    case 1:
+                    case 1: {
                         labelMetode = "Digital Wallet (Internal)";
                         if (userSekarang.saldoWallet >= totalAkhir) {
                             userSekarang.kurangiSaldo(totalAkhir);
@@ -541,52 +560,62 @@ int main() {
                             cout << "X Saldo Wallet internal Anda tidak mencukupi! Silakan isi saldo dulu.\n";
                         }
                         break;
-                    case 2:
+                    }
+                    case 2: {
                         labelMetode = "Direct Bank VA";
                         cout << "[DIRECT BANK VA] Masukkan nomor rekening VA tujuan transfer Anda untuk validasi otomatis: ";
-                        char inputVA[30]; cin >> inputVA;
+                        string inputVA; cin >> inputVA;
                         pembayaranSukses = 1;
                         break;
-                    case 3:
+                    }
+                    case 3: {
                         labelMetode = "Direct Indomaret";
                         cout << "[DIRECT INDOMARET] Harap selesaikan pembayaran di kasir dengan Kode: TRM" << userSekarang.nik.substr(4, 5) << "\n";
                         pembayaranSukses = 1;
                         break;
-                    case 4:
+                    }
+                    case 4: {
                         labelMetode = "Direct Alfamart";
                         cout << "[DIRECT ALFAMART] Harap selesaikan pembayaran di kasir dengan Kode: TRMA" << userSekarang.nik.substr(5, 5) << "\n";
                         pembayaranSukses = 1;
                         break;
-                    case 5:
+                    }
+                    case 5: {
                         labelMetode = "Direct GoPay";
                         cout << "[DIRECT GOPAY] Masukkan PIN Keamanan GoPay Anda untuk menyetujui transaksi: ";
-                        char pinGopay[10]; cin >> pinGopay;
+                        string pinGopay; cin >> pinGopay;
                         pembayaranSukses = 1;
                         break;
-                    case 6:
+                    }
+                    case 6: {
                         labelMetode = "Direct DANA";
                         cout << "[DIRECT DANA] Masukkan OTP yang dikirim ke nomor handphone terdaftar Anda: ";
-                        char otpDana[10]; cin >> otpDana;
+                        string otpDana; cin >> otpDana;
                         pembayaranSukses = 1;
                         break;
-                    case 7:
+                    }
+                    case 7: {
                         labelMetode = "Direct PayPal Account";
                         cout << "[DIRECT PAYPAL] Memproses pemotongan dana internasional terotentikasi aman...\n";
                         pembayaranSukses = 1;
                         break;
-                    case 8:
+                    }
+                    case 8: {
                         labelMetode = "Direct ShopeePay";
                         cout << "[DIRECT SHOPEEPAY] Scan wajah / sidik jari pada perangkat seluler Anda...\n";
                         pembayaranSukses = 1;
                         break;
-                    case 9:
+                    }
+                    case 9: {
                         labelMetode = "Direct QRIS Scanner";
                         cout << "[DIRECT QRIS] Sistem mendeteksi pemindaian sukses dari mobile banking.\n";
                         pembayaranSukses = 1;
                         break;
-                    default:
+                    }
+                    default: {
                         cout << "Metode pembayaran tidak dikenal!\n";
                         break;
+                    }
                 }
 
                 switch (pembayaranSukses) {
@@ -628,10 +657,10 @@ int main() {
                         userSekarang.kosongkanKeranjang();
                         break;
                     }
-                    case 0:
-                    default:
+                    default: {
                         cout << "X Pembayaran Gagal Diproses!\n";
                         break;
+                    }
                 }
                 break;
             }
