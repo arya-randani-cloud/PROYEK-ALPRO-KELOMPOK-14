@@ -159,17 +159,6 @@ public:
         }
     }
 
-    void tambahKeranjang(Produk p, int qty) {
-        if (jumlahItemKeranjang < MAKS_KERANJANG) {
-            keranjang[jumlahItemKeranjang].produk = p;
-            keranjang[jumlahItemKeranjang].kuantitas = qty;
-            jumlahItemKeranjang++;
-            cout << "-> " << p.namaProduk << " (" << qty << " pcs) dimasukkan ke keranjang.\n";
-        } else {
-            cout << "Keranjang penuh!\n";
-        }
-    }
-
     void kurangiSaldo(double jumlah) {
         saldoWallet -= jumlah;
     }
@@ -214,6 +203,7 @@ int main() {
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P01", "Kemeja Flanel", 20, 399000));
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P02", "AIRism T-Shirt", 50, 199000));
 
+    // Kode ditambahkan di sini, sisa inisialisasi awal tetap dipertahankan
     daftarTokoMall[totalToko++] = Toko("T02", "H&M", "Fashion, Pakaian & Department Store (Trendi & Aksesoris)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P03", "Hoodie Regular", 15, 449000));
 
@@ -255,6 +245,7 @@ int main() {
     daftarTokoMall[totalToko++] = Toko("T14", "Samsung Store / Xiaomi Store", "Gadget, Elektronik & Kamera");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P15", "Smart Ecosystem TV", 5, 4500000));
 
+    // Metode pembayaran e-wallet seperti gopay dana paypal shopeepay qris indomaret alfamart bank va
     daftarTokoMall[totalToko++] = Toko("T15", "Bli-Bli Tukar Tambah", "Gadget, Elektronik & Kamera (Layanan TT)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P16", "Voucher Tukar Tambah", 100, 500000));
 
@@ -304,7 +295,7 @@ int main() {
 
     // --- SISTEM LOGIN/AUTENTIKASI AWAL ---
     cout << "=========================================\n";
-    cout << "        LOGIN SYSTEM CERAN_HUB MALL       \n";
+    cout << "         LOGIN SYSTEM CERAN_HUB MALL       \n";
     cout << "=========================================\n";
     while (!sedangLogin) {
         string inpUser, inpPass;
@@ -329,7 +320,7 @@ int main() {
     int pilihanMenu;
     do {
         cout << "\n=========================================\n";
-        cout << "        WELCOME TO CERAN_HUB MALL        \n";
+        cout << "         WELCOME TO CERAN_HUB MALL        \n";
         cout << "=========================================\n";
         cout << "Loged in as: " << userSekarang.nama << "\n";
         cout << "1. Lihat Profil & Fitur Dompet Digital (Wallet)\n";
@@ -341,142 +332,328 @@ int main() {
         cout << "Pilihan Anda: ";
         cin >> pilihanMenu;
 
-        if (pilihanMenu == 1) {
-            userSekarang.tampilkanProfil();
-            cout << "\nApakah ingin Top Up Saldo Wallet? (y/n): ";
-            char opsi;
-            cin >> opsi;
-            if (opsi == 'y' || opsi == 'Y') {
-                double nominal;
-                cout << "Masukkan nominal Top Up: Rp";
-                cin >> nominal;
-                userSekarang.isiSaldo(nominal);
-            }
-        } 
-        else if (pilihanMenu == 2) {
-            string kataKunci;
-            cout << "\nMasukkan kata kunci pencarian toko/kategori (contoh: 'Batik', 'Udon', 'Gadget'): ";
-            cin.ignore();
-            getline(cin, kataKunci);
-
-            cout << "\n--- HASIL PENCARIAN KATA KUNCI '" << kataKunci << "' ---\n";
-            bool ditemukan = false;
-            for (int i = 0; i < totalToko; ++i) {
-                if (mengandungKata(daftarTokoMall[i].namaToko, kataKunci) || 
-                    mengandungKata(daftarTokoMall[i].kategori, kataKunci)) {
-                    cout << "- [" << daftarTokoMall[i].idToko << "] " << daftarTokoMall[i].namaToko 
-                         << " | " << daftarTokoMall[i].kategori << "\n";
-                    ditemukan = true;
-                }
-            }
-            if (!ditemukan) cout << "Toko atau kategori tidak ditemukan.\n";
-        } 
-        else if (pilihanMenu == 3) {
-            cout << "\n--- DAFTAR GERAI MERCHANT DI MALL ---\n";
-            for (int i = 0; i < totalToko; ++i) {
-                cout << i + 1 << ". " << daftarTokoMall[i].namaToko << "\n";
-            }
-            cout << "Pilih nomor toko: ";
-            int indeksToko;
-            cin >> indeksToko;
-
-            if (indeksToko > 0 && indeksToko <= totalToko) {
-                Toko& tokoTerpilih = daftarTokoMall[indeksToko - 1];
-                tokoTerpilih.cetakKatalog();
-
-                cout << "\nPilih nomor barang yang ingin dimasukkan keranjang: ";
-                int indeksBarang;
-                cin >> indeksBarang;
-
-                if (indeksBarang > 0 && indeksBarang <= tokoTerpilih.jumlahProduk) {
-                    Produk& produkTerpilih = tokoTerpilih.daftarBarang[indeksBarang - 1];
-                    cout << "Masukkan Jumlah (Qty): ";
-                    int qty;
-                    cin >> qty;
-
-                    if (qty <= produkTerpilih.stok) {
-                        produkTerpilih.kurangiStok(qty);
-                        userSekarang.tambahKeranjang(produkTerpilih, qty);
-                    } else {
-                        cout << "X Stok tidak mencukupi! Sisa stok: " << produkTerpilih.stok << endl;
+        switch (pilihanMenu) {
+            case 1: {
+                userSekarang.tampilkanProfil();
+                cout << "\nApakah ingin Top Up Saldo Wallet? (y/n): ";
+                char opsi;
+                cin >> opsi;
+                if (opsi == 'y' || opsi == 'Y') {
+                    double nominal;
+                    cout << "Masukkan nominal Top Up: Rp";
+                    cin >> nominal;
+                    
+                    cout << "\n=== PILIH METODE TOP UP SALDO ===\n";
+                    cout << "1. Bank Virtual Account (VA)\n";
+                    cout << "2. Indomaret\n";
+                    cout << "3. Alfamart\n";
+                    cout << "4. GoPay\n";
+                    cout << "5. DANA\n";
+                    cout << "6. PayPal\n";
+                    cout << "7. ShopeePay\n";
+                    cout << "8. QRIS (Scan dan Bayar)\n";
+                    cout << "Pilihan Metode: ";
+                    int mTopUp;
+                    cin >> mTopUp;
+                    
+                    int statusProses = 1; 
+                    switch (mTopUp) {
+                        case 1:
+                            cout << "\n[BANK VIRTUAL ACCOUNT]\n";
+                            cout << "Pilih Bank:\n1. BRI\n2. BCA\n3. Mandiri\n4. BNI\nPilihan Bank: ";
+                            int subBank;
+                            cin >> subBank;
+                            switch (subBank) {
+                                case 1: cout << "Nomor VA BRI Anda: 88810" << userSekarang.nik.substr(0, 5) << "\n"; break;
+                                case 2: cout << "Nomor VA BCA Anda: 39010" << userSekarang.nik.substr(0, 5) << "\n"; break;
+                                case 3: cout << "Nomor VA Mandiri Anda: 89608" << userSekarang.nik.substr(0, 5) << "\n"; break;
+                                case 4: cout << "Nomor VA BNI Anda: 82410" << userSekarang.nik.substr(0, 5) << "\n"; break;
+                                default: cout << "Bank tidak tersedia.\n"; statusProses = 0; break;
+                            }
+                            break;
+                        case 2:
+                            cout << "\n[GERAI INDOMARET]\n";
+                            cout << "Kode Pembayaran Indomaret: IDM" << userSekarang.nik.substr(2, 6) << "\n";
+                            cout << "Silakan tunjukkan kode ini ke kasir Indomaret terdekat.\n";
+                            break;
+                        case 3:
+                            cout << "\n[GERAI ALFAMART]\n";
+                            cout << "Kode Pembayaran Alfamart: ALFA" << userSekarang.nik.substr(1, 6) << "\n";
+                            cout << "Silakan tunjukkan kode ini ke kasir Alfamart terdekat.\n";
+                            break;
+                        case 4:
+                            cout << "\n[E-WALLET GOPAY]\n";
+                            cout << "Menghubungkan ke aplikasi Gojek...\n";
+                            cout << "Masukkan Nomor HP GoPay Anda: ";
+                            char noGopay[20]; cin >> noGopay;
+                            cout << "Permintaan bayar dikirim ke aplikasi Anda.\n";
+                            break;
+                        case 5:
+                            cout << "\n[E-WALLET DANA]\n";
+                            cout << "Membuka gerbang pembayaran DANA...\n";
+                            cout << "Masukkan Nomor ID DANA Anda: ";
+                            char noDana[20]; cin >> noDana;
+                            cout << "Silakan konfirmasi PIN pada pop-up smartphone Anda.\n";
+                            break;
+                        case 6:
+                            cout << "\n[PAYPAL GLOBAL PAYMENT]\n";
+                            cout << "Kurs konversi otomatis diterapkan ke USD.\n";
+                            cout << "Masukkan Email PayPal Anda: ";
+                            char emailPaypal[40]; cin >> emailPaypal;
+                            cout << "Otentikasi tagihan internasional berhasil.\n";
+                            break;
+                        case 7:
+                            cout << "\n[E-WALLET SHOPEEPAY]\n";
+                            cout << "Membuka Aplikasi Shopee...\n";
+                            cout << "Masukkan Username Shopee: ";
+                            char userShopee[30]; cin >> userShopee;
+                            cout << "Notifikasi tagihan telah dikirim ke akun ShopeePay Anda.\n";
+                            break;
+                        case 8:
+                            cout << "\n[QRIS - AUTOMATIC SCANNER]\n";
+                            cout << "###########################\n";
+                            cout << "##   [QRIS BARCODE SCAN] ##\n";
+                            cout << "##    CERAN_HUB DYNAMIC  ##\n";
+                            cout << "###########################\n";
+                            cout << "Silakan scan kode QR di atas menggunakan aplikasi finansial Anda.\n";
+                            break;
+                        default:
+                            cout << "Pilihan metode top up tidak valid!\n";
+                            statusProses = 0;
+                            break;
+                    }
+                    
+                    switch (statusProses) {
+                        case 1:
+                            cout << "Tekan 1 untuk menyelesaikan proses verifikasi pembayaran: ";
+                            int verif; cin >> verif;
+                            switch (verif) {
+                                case 1:
+                                    userSekarang.isiSaldo(nominal);
+                                    break;
+                                default:
+                                    cout << "Verifikasi gagal! Top up dibatalkan.\n";
+                                    break;
+                            }
+                            break;
+                        case 0:
+                        default:
+                            break;
                     }
                 }
+                break;
             }
-        } 
-        else if (pilihanMenu == 4) {
-            if (userSekarang.jumlahItemKeranjang == 0) {
-                cout << "X Keranjang belanja Anda masih kosong!\n";
-                continue;
-            }
+            case 2: {
+                string kataKunci;
+                cout << "\nMasukkan kata kunci pencarian toko/kategori (contoh: 'Batik', 'Udon', 'Gadget'): ";
+                cin.ignore();
+                getline(cin, kataKunci);
 
-            double totalBelanja = 0;
-            for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i) {
-                totalBelanja += userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas;
-            }
-
-            double pajak = totalBelanja * 0.11; 
-            double totalAkhir = totalBelanja + pajak;
-
-            cout << "\n--- KONFIRMASI PEMBAYARAN ---\n";
-            cout << "Total Belanja : Rp" << fixed << setprecision(0) << totalBelanja << "\n";
-            cout << "Pajak (PPN 11%): Rp" << pajak << "\n";
-            cout << "Total Tagihan : Rp" << totalAkhir << "\n";
-            
-            cout << "Apakah Anda ingin melanjutkan pembayaran? (y/n): ";
-            char konfirmasi;
-            cin >> konfirmasi;
-            
-            if (konfirmasi == 'y' || konfirmasi == 'Y') {
-                if (userSekarang.saldoWallet >= totalAkhir) {
-                    userSekarang.kurangiSaldo(totalAkhir);
-                    totalSirkulasiFinansial += totalAkhir;
-                    
-                    // Cetak Struk Belanja Resmi
-                    cout << "\n=========================================\n";
-                    cout << "             STRUK PEMBAYARAN            \n";
-                    cout << "=========================================\n";
-                    WaktuTransaksi waktu;
-                    waktu.setWaktuSekarang();
-                    cout << "Waktu Transaksi : "; waktu.cetakWaktu();
-                    cout << "Nama Pelanggan  : " << userSekarang.nama << "\n";
-                    cout << "-----------------------------------------\n";
-                    for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i) {
-                        cout << userSekarang.keranjang[i].produk.namaProduk << " x" 
-                             << userSekarang.keranjang[i].kuantitas << " : Rp" 
-                             << fixed << setprecision(0) << userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas << "\n";
+                cout << "\n--- HASIL PENCARIAN KATA KUNCI '" << kataKunci << "' ---\n";
+                bool ditemukan = false;
+                for (int i = 0; i < totalToko; ++i) {
+                    if (mengandungKata(daftarTokoMall[i].namaToko, kataKunci) || 
+                        mengandungKata(daftarTokoMall[i].kategori, kataKunci)) {
+                        cout << "- [" << daftarTokoMall[i].idToko << "] " << daftarTokoMall[i].namaToko 
+                             << " | " << daftarTokoMall[i].kategori << "\n";
+                        ditemukan = true;
                     }
-                    cout << "-----------------------------------------\n";
-                    cout << "Subtotal        : Rp" << totalBelanja << "\n";
-                    cout << "PPN (11%)       : Rp" << pajak << "\n";
-                    cout << "Total Bayar     : Rp" << totalAkhir << "\n";
-                    cout << "Sisa Saldo      : Rp" << userSekarang.saldoWallet << "\n";
-                    cout << "=========================================\n";
-                    cout << "      Terima Kasih Telah Berbelanja!     \n";
-                    
-                    // Kosongkan keranjang setelah checkout sukses
-                    userSekarang.kosongkanKeranjang();
+                }
+                if (!ditemukan) cout << "Toko atau kategori tidak ditemukan.\n";
+                break;
+            }
+            case 3: {
+                cout << "\n--- DAFTAR GERAI MERCHANT DI MALL ---\n";
+                for (int i = 0; i < totalToko; ++i) {
+                    cout << i + 1 << ". " << daftarTokoMall[i].namaToko << "\n";
+                }
+                cout << "Pilih nomor toko: ";
+                int indeksToko;
+                cin >> indeksToko;
+
+                if (indeksToko > 0 && indeksToko <= totalToko) {
+                    Toko& tokoTerpilih = daftarTokoMall[indeksToko - 1];
+                    tokoTerpilih.cetakKatalog();
+
+                    cout << "\nPilih nomor barang yang ingin dimasukkan keranjang: ";
+                    int indeksBarang;
+                    cin >> indeksBarang;
+
+                    if (indeksBarang > 0 && indeksBarang <= tokoTerpilih.jumlahProduk) {
+                        Produk& produkTerpilih = tokoTerpilih.daftarBarang[indeksBarang - 1];
+                        cout << "Masukkan Jumlah (Qty): ";
+                        int qty;
+                        cin >> qty;
+
+                        if (qty <= produkTerpilih.stok) {
+                            produkTerpilih.kurangiStok(qty);
+                            userSekarang.tambahKeranjang(produkTerpilih, qty);
+                        } else {
+                            cout << "X Stok tidak mencukupi! Sisa stok: " << produkTerpilih.stok << endl;
+                        }
+                    }
+                }
+                break;
+            }
+            case 4: {
+                if (userSekarang.jumlahItemKeranjang == 0) {
+                    cout << "X Keranjang belanja Anda masih kosong!\n";
+                    break;
+                }
+
+                double totalBelanja = 0;
+                for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i) {
+                    totalBelanja += userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas;
+                }
+
+                double pajak = totalBelanja * 0.11; 
+                double totalAkhir = totalBelanja + pajak;
+
+                cout << "\n--- KONFIRMASI PEMBAYARAN ---\n";
+                cout << "Total Belanja : Rp" << fixed << setprecision(0) << totalBelanja << "\n";
+                cout << "Pajak (PPN 11%): Rp" << pajak << "\n";
+                cout << "Total Tagihan : Rp" << totalAkhir << "\n";
+                
+                cout << "\nPILIK METODE PEMBAYARAN TRANSAKSI:\n";
+                cout << "1. Bayar Menggunakan Saldo Digital Wallet Terintegrasi\n";
+                cout << "2. Direct Bank Virtual Account (VA)\n";
+                cout << "3. Direct Over-The-Counter Indomaret\n";
+                cout << "4. Direct Over-The-Counter Alfamart\n";
+                cout << "5. Direct E-Wallet GoPay\n";
+                cout << "6. Direct E-Wallet DANA\n";
+                cout << "7. Direct PayPal Account Gateway\n";
+                cout << "8. Direct E-Wallet ShopeePay\n";
+                cout << "9. Direct QRIS Universal Scan\n";
+                cout << "Pilihan Anda: ";
+                int metodeBayar;
+                cin >> metodeBayar;
+
+                int pembayaranSukses = 0;
+                string labelMetode = "";
+
+                switch (metodeBayar) {
+                    case 1:
+                        labelMetode = "Digital Wallet (Internal)";
+                        if (userSekarang.saldoWallet >= totalAkhir) {
+                            userSekarang.kurangiSaldo(totalAkhir);
+                            pembayaranSukses = 1;
+                        } else {
+                            cout << "X Saldo Wallet internal Anda tidak mencukupi! Silakan isi saldo dulu.\n";
+                        }
+                        break;
+                    case 2:
+                        labelMetode = "Direct Bank VA";
+                        cout << "[DIRECT BANK VA] Masukkan nomor rekening VA tujuan transfer Anda untuk validasi otomatis: ";
+                        char inputVA[30]; cin >> inputVA;
+                        pembayaranSukses = 1;
+                        break;
+                    case 3:
+                        labelMetode = "Direct Indomaret";
+                        cout << "[DIRECT INDOMARET] Harap selesaikan pembayaran di kasir dengan Kode: TRM" << userSekarang.nik.substr(4, 5) << "\n";
+                        pembayaranSukses = 1;
+                        break;
+                    case 4:
+                        labelMetode = "Direct Alfamart";
+                        cout << "[DIRECT ALFAMART] Harap selesaikan pembayaran di kasir dengan Kode: TRMA" << userSekarang.nik.substr(5, 5) << "\n";
+                        pembayaranSukses = 1;
+                        break;
+                    case 5:
+                        labelMetode = "Direct GoPay";
+                        cout << "[DIRECT GOPAY] Masukkan PIN Keamanan GoPay Anda untuk menyetujui transaksi: ";
+                        char pinGopay[10]; cin >> pinGopay;
+                        pembayaranSukses = 1;
+                        break;
+                    case 6:
+                        labelMetode = "Direct DANA";
+                        cout << "[DIRECT DANA] Masukkan OTP yang dikirim ke nomor handphone terdaftar Anda: ";
+                        char otpDana[10]; cin >> otpDana;
+                        pembayaranSukses = 1;
+                        break;
+                    case 7:
+                        labelMetode = "Direct PayPal Account";
+                        cout << "[DIRECT PAYPAL] Memproses pemotongan dana internasional terotentikasi aman...\n";
+                        pembayaranSukses = 1;
+                        break;
+                    case 8:
+                        labelMetode = "Direct ShopeePay";
+                        cout << "[DIRECT SHOPEEPAY] Scan wajah / sidik jari pada perangkat seluler Anda...\n";
+                        pembayaranSukses = 1;
+                        break;
+                    case 9:
+                        labelMetode = "Direct QRIS Scanner";
+                        cout << "[DIRECT QRIS] Sistem mendeteksi pemindaian sukses dari mobile banking.\n";
+                        pembayaranSukses = 1;
+                        break;
+                    default:
+                        cout << "Metode pembayaran tidak dikenal!\n";
+                        break;
+                }
+
+                switch (pembayaranSukses) {
+                    case 1: {
+                        totalSirkulasiFinansial += totalAkhir;
+                        
+                        // Cetak Struk Belanja Resmi
+                        cout << "\n=========================================\n";
+                        cout << "             STRUK PEMBAYARAN            \n";
+                        cout << "=========================================\n";
+                        WaktuTransaksi waktu;
+                        waktu.setWaktuSekarang();
+                        cout << "Waktu Transaksi : "; waktu.cetakWaktu();
+                        cout << "Nama Pelanggan  : " << userSekarang.nama << "\n";
+                        cout << "Metode Bayar    : " << labelMetode << "\n";
+                        cout << "-----------------------------------------\n";
+                        for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i) {
+                            cout << userSekarang.keranjang[i].produk.namaProduk << " x" 
+                                 << userSekarang.keranjang[i].kuantitas << " : Rp" 
+                                 << fixed << setprecision(0) << userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas << "\n";
+                        }
+                        cout << "-----------------------------------------\n";
+                        cout << "Subtotal        : Rp" << totalBelanja << "\n";
+                        cout << "PPN (11%)       : Rp" << pajak << "\n";
+                        cout << "Total Bayar     : Rp" << totalAkhir << "\n";
+                        
+                        switch (metodeBayar) {
+                            case 1:
+                                cout << "Sisa Saldo Wallet: Rp" << userSekarang.saldoWallet << "\n";
+                                break;
+                            default:
+                                cout << "Sisa Saldo Wallet: Rp" << userSekarang.saldoWallet << " (Tidak Berubah)\n";
+                                break;
+                        }
+                        
+                        cout << "=========================================\n";
+                        cout << "      Terima Kasih Telah Berbelanja!     \n";
+                        
+                        userSekarang.kosongkanKeranjang();
+                        break;
+                    }
+                    case 0:
+                    default:
+                        cout << "X Pembayaran Gagal Diproses!\n";
+                        break;
+                }
+                break;
+            }
+            case 5: {
+                string kunci;
+                cout << "\nMasukkan Kunci Keamanan Admin: ";
+                cin >> kunci;
+                if (kunci == adminUtama.kunciKeamanan) {
+                    adminUtama.pantauKeuangan(totalSirkulasiFinansial);
                 } else {
-                    cout << "X Saldo Wallet tidak mencukupi! Silakan Top Up terlebih dahulu.\n";
+                    cout << "X Kunci Keamanan Salah! Akses Ditolak.\n";
                 }
-            } else {
-                cout << "Transaksi dibatalkan.\n";
+                break;
             }
-        }
-        else if (pilihanMenu == 5) {
-            string kunci;
-            cout << "\nMasukkan Kunci Keamanan Admin: ";
-            cin >> kunci;
-            if (kunci == adminUtama.kunciKeamanan) {
-                adminUtama.pantauKeuangan(totalSirkulasiFinansial);
-            } else {
-                cout << "X Kunci Keamanan Salah! Akses Ditolak.\n";
+            case 6: {
+                cout << "\nTerima kasih telah berkunjung ke CERAN_HUB MALL!\n";
+                break;
             }
-        }
-        else if (pilihanMenu == 6) {
-            cout << "\nTerima kasih telah berkunjung ke CERAN_HUB MALL!\n";
-        }
-        else {
-            cout << "X Pilihan menu tidak valid!\n";
+            default: {
+                cout << "X Pilihan menu tidak valid!\n";
+                break;
+            }
         }
     } while (pilihanMenu != 6);
 
