@@ -8,14 +8,22 @@
 using namespace std;
 
 // ==========================================
-//              STRUKTUR DATA
+//                 STRUKTUR DATA
 // ==========================================
 struct Produk {
     int id;
     string nama;
     string kategori;
-    double harga;
+    double hargaBeli; // Untuk keperluan laporan pengeluaran restock
+    double hargaJual; // Untuk keperluan laporan pemasukan
     int stok;
+};
+
+struct KeuanganToko {
+    double saldoKas;
+    double totalPemasukan;
+    double totalPengeluaran;
+    double totalPajak;
 };
 
 struct Toko {
@@ -24,13 +32,8 @@ struct Toko {
     string kategoriDijual; 
     double ratingToko;
     int jumlahUlasan;
+    KeuanganToko keuangan;
     vector<Produk> daftarProduk;
-};
-
-struct KeranjangItem {
-    string dariToko;
-    Produk produk;
-    int jumlah;
 };
 
 struct User {
@@ -40,19 +43,28 @@ struct User {
     bool isAdmin;
 };
 
+struct PesananMasuk {
+    string namaPembeli;
+    string alamatPembeli;
+    string namaToko;
+    string namaProduk;
+    int jumlah;
+    double totalBayar;
+};
+
 // ==========================================
 //         DATABASE SIMULASI GLOBAL
 // ==========================================
 vector<User> databaseUser;
 vector<Toko> daftarTokoMarketplace;
-vector<KeranjangItem> keranjangBelanja;
+vector<PesananMasuk> riwayatPesanan; // Untuk pengecekan alamat pemesan
 
 User userLogin; 
 bool isLoggedIn = false;
-bool sudahRegistrasi = false; 
+bool sudahRegistrasi = false; // Flag untuk membatasi registrasi cukup sekali
 
 // ==========================================
-//            PROTOTIPE FUNGSI
+//             PROTOTIPE FUNGSI
 // ==========================================
 void inisialisasiMarketplace();
 void bersihkanLayar();
@@ -60,33 +72,31 @@ void tungguEnter();
 void cetakGaris(int panjang, char simbol);
 
 void menuAutentikasi();
-void registrasiAkun();
-void loginAkun();
+void registrasiAkunToko();
+void loginAkunToko();
 
-void menuUtama();
-void tampilkanKatalogToko();
-void cariProduk();
-void tambahKeKeranjang();
-void lihatKeranjangDanCheckout();
-void berikanUlasanToko();
+void menuUtamaAdmin();
+void tampilkanListBarangToko();
+void manajemenKeuanganToko();
+void cekAlamatPemesan();
+void updateStokPemasukan();
+void updateStokPengeluaran();
 
-void menuManajemenTokoAdmin();
-void hitungTotalAset();
+// PANEL MANAJEMEN STRUKTUR TOKO
+void panelManajemenToko();
 void tambahTokoBaru();
 void hapusToko();
 void tambahProdukKeToko();
-void updateStokMasuk();
-void updateStokKeluar();
 void hapusProduk();
 
 // ==========================================
-//               MAIN FUNCTION
+//                 MAIN FUNCTION
 // ==========================================
 int main() {
     inisialisasiMarketplace();
     while (true) {
         if (!isLoggedIn) menuAutentikasi();
-        else menuUtama();
+        else menuUtamaAdmin();
     }
     return 0;
 }
@@ -114,27 +124,23 @@ void cetakGaris(int panjang, char simbol) {
 }
 
 void inisialisasiMarketplace() {
-    databaseUser.push_back({"admin", "admin123", "Kantor Pusat", true});
-    databaseUser.push_back({"budi", "budi123", "Jl. Merdeka No. 45", false});
-    sudahRegistrasi = true;
-
-    Toko uniqlo = {101, "uniqlo", "pakaian", 4.8, 10, {
-        {101, "celana jeans", "pakaian", 120000, 40},
-        {106, "Kemeja Polos", "pakaian", 125000, 50}
+    // Data Default Toko & Keuangan Awal
+    Toko uniqlo = {101, "uniqlo", "pakaian", 4.8, 1, {5000000, 1500000, 500000, 165000}, {
+        {101, "Celana Jeans", "pakaian", 80000, 120000, 40},
+        {106, "Kemeja Polos", "pakaian", 70000, 125000, 50}
     }};
     
-    Toko holland = {102, "holland bakery", "makanan", 4.5, 5, {
-        {102, "Roti Cokelat", "makanan", 12000, 25},
-        {103, "Susu Kotak UHT", "minuman", 6500, 100}
-    }};
-
-    Toko matahari = {103, "matahari", "pakaian", 4.2, 4, {
-        {104, "Jaket Denim", "pakaian", 250000, 20}
+    Toko holland = {102, "holland bakery", "makanan", 4.5, 1, {3000000, 800000, 300000, 88000}, {
+        {102, "Roti Cokelat", "makanan", 7000, 12000, 25},
+        {103, "Susu Kotak UHT", "minuman", 4000, 6500, 100}
     }};
 
     daftarTokoMarketplace.push_back(uniqlo);
     daftarTokoMarketplace.push_back(holland);
-    daftarTokoMarketplace.push_back(matahari);
+
+    // Simulasi Pesanan Masuk (untuk cek alamat pemesan)
+    riwayatPesanan.push_back({"Budi Santoso", "Jl. Merdeka No. 45, Jakarta", "uniqlo", "Kemeja Polos", 2, 250000});
+    riwayatPesanan.push_back({"Siti Aminah", "Jl. Anggrek Raya No. 12, Bandung", "holland bakery", "Roti Cokelat", 5, 60000});
 }
 
 // ==========================================
@@ -143,11 +149,28 @@ void inisialisasiMarketplace() {
 void menuAutentikasi() {
     bersihkanLayar();
     int pilihan;
-    cetakGaris(45, '=');
-    cout << "     SELAMAT DATANG DI MARKETPLACE\n";
-    cetakGaris(45, '=');
-    cout << "1. Registrasi Akun Baru\n2. Login ke Aplikasi\n3. Keluar Aplikasi\n";
-    cetakGaris(45, '-');
+
+    cout << "\033[1;36m";
+    cout << "=========================================================================\n";
+    cout << "  ____ _____ ____    _    _   _       _   _ _   _ ____  \n";
+    cout << " / ___| ____|  _ \\  / \\  | \\ | |     | | | | | | | __ ) \n";
+    cout << "| |   |  _| | |_) |/ _ \\ |  \\| |_____| |_| | | | |  _ \\ \n";
+    cout << "| |___| |___|  _ </ ___ \\| |\\  |_____|  _  | |_| | |_) |\n";
+    cout << " \\____|_____|_|\\_/_/   \\_\\_| \\_|     |_| |_|\\___/|____/ \n";
+    cout << "                                                        \n";
+    cout << "=========================================================================\n";
+    cout << "             Welcome to CERAN_HUB Admin Store                     \n";
+    cout << "=========================================================================\n";
+    cout << "\033[0m";
+
+    // Pilihan registrasi hanya muncul jika belum pernah registrasi
+    if (!sudahRegistrasi) {
+        cout << "1. Registrasi Akun Utama Admin \n";
+    } else {
+        cout << "[INFO] Kuota Registrasi Sudah Habis / Terkunci\n1. (Registrasi Tidak Tersedia)\n";
+    }
+    cout << "2. Login Admin\n3. Keluar Aplikasi\n";
+    cetakGaris(73, '-');
     cout << "Pilih Opsi (1-3): "; cin >> pilihan;
 
     if (cin.fail()) {
@@ -156,62 +179,74 @@ void menuAutentikasi() {
     }
 
     switch (pilihan) {
-        case 1: registrasiAkun(); break;
-        case 2: loginAkun(); break;
+        case 1: 
+            if (!sudahRegistrasi) registrasiAkunToko(); 
+            else { cout << "[!] Anda sudah meregistrasi akun sebelumnya!\n"; tungguEnter(); }
+            break;
+        case 2: loginAkunToko(); break;
         case 3: cout << "\nTerima kasih!\n"; exit(0);
         default: cout << "[!] Opsi salah!\n"; tungguEnter();
     }
 }
 
-void registrasiAkun() {
+void registrasiAkunToko() {
     bersihkanLayar();
     User userBaru;
-    cout << "=== REGISTRASI AKUN ===\n";
+    cout << "=== REGISTRASI AKUN ADMIN (Satu Kali) ===\n";
     cout << "Username Baru : "; cin >> userBaru.username;
     cout << "Password Baru : "; cin >> userBaru.password;
     cin.ignore(1000, '\n');
-    cout << "Alamat Lengkap: "; getline(cin, userBaru.alamat);
-    userBaru.isAdmin = false;
+    cout << "Alamat Kantor : "; getline(cin, userBaru.alamat);
+    userBaru.isAdmin = true;
 
-    for(const auto& u : databaseUser) {
-        if(u.username == userBaru.username) {
-            cout << "\n[!] Username sudah ada!\n"; tungguEnter(); return;
-        }
-    }
     databaseUser.push_back(userBaru);
-    cout << "\n[Sukses] Registrasi Berhasil!\n"; tungguEnter();
+    sudahRegistrasi = true; // Kunci registrasi agar tidak bisa dipakai lagi
+    cout << "\n[Sukses] Akun admin berhasil dibuat! Menu registrasi sekarang ditutup.\n"; 
+    tungguEnter();
 }
 
-void loginAkun() {
+void loginAkunToko() {
     bersihkanLayar();
     string uname, pword;
-    cout << "=== HALAMAN LOGIN ===\n";
+    cout << "=== HALAMAN LOGIN ADMIN ===\n";
     cout << "Username : "; cin >> uname;
     cout << "Password : "; cin >> pword;
+
+    // Cek database buatan atau default admin
+    if((uname == "admin" && pword == "admin123")) {
+        userLogin = {"admin", "admin123", "Kantor Pusat", true};
+        isLoggedIn = true;
+        cout << "\n[Sukses] Selamat datang, Super Admin.\n";
+        tungguEnter(); return;
+    }
 
     for (auto& u : databaseUser) {
         if (u.username == uname && u.password == pword) {
             userLogin = u; isLoggedIn = true;
-            cout << "\n[Sukses] Selamat datang, " << userLogin.username << ".\n";
+            cout << "\n[Sukses] Selamat datang Admin, " << userLogin.username << ".\n";
             tungguEnter(); return;
         }
     }
-    cout << "\n[!] Username/Password salah!"; tungguEnter();
+    cout << "\n[!] Username/Password salah atau belum terdaftar!"; tungguEnter();
 }
 
 // ==========================================
-//             FITUR MENU UTAMA
+//              MENU UTAMA ADMIN
 // ==========================================
-void menuUtama() {
+void menuUtamaAdmin() {
     bersihkanLayar();
     int pilihan;
-    cetakGaris(40, '=');
-    cout << "               MENU UTAMA\n";
-    cetakGaris(40, '=');
-    cout << "1. Tampilkan Katalog Toko\n2. Cari Produk\n3. Tambah ke Keranjang\n4. Lihat Keranjang & Checkout\n5. Berikan Ulasan Toko\n";
-    if (userLogin.isAdmin) cout << "6. Panel Admin\n";
-    cout << "7. Logout\n";
-    cetakGaris(40, '-');
+    cetakGaris(50, '=');
+    cout << "          ADMIN TOKO CERAN_HUB\n";
+    cetakGaris(50, '=');
+    cout << "1. List Barang per Toko\n";
+    cout << "2. Laporan & Manajemen Keuangan Toko\n";
+    cout << "3. Pengecekan Alamat User (Pemesan)\n";
+    cout << "4. Update Stok Pemasukan (Restock Toko)\n";
+    cout << "5. Update Stok Pengeluaran (Buang/Retur Barang)\n";
+    cout << "6. Pengaturan Struktur Toko & Produk (Tambah/Hapus)\n";
+    cout << "7. Logout Kendali\n";
+    cetakGaris(50, '-');
     cout << "Pilih menu: "; cin >> pilihan;
 
     if (cin.fail()) {
@@ -220,282 +255,281 @@ void menuUtama() {
     }
 
     switch (pilihan) {
-        case 1: tampilkanKatalogToko(); break;
-        case 2: cariProduk(); break;
-        case 3: tambahKeKeranjang(); break;
-        case 4: lihatKeranjangDanCheckout(); break;
-        case 5: berikanUlasanToko(); break;
-        case 6: 
-            if (userLogin.isAdmin) menuManajemenTokoAdmin();
-            else cout << "[!] Menu tidak valid!\n"; break;
+        case 1: tampilkanListBarangToko(); break;
+        case 2: manajemenKeuanganToko(); break;
+        case 3: cekAlamatPemesan(); break;
+        case 4: updateStokPemasukan(); break;
+        case 5: updateStokPengeluaran(); break;
+        case 6: panelManajemenToko(); break;
         case 7:
-            isLoggedIn = false; keranjangBelanja.clear();
-            cout << "\n[Sukses] Berhasil logout.\n"; tungguEnter(); break;
+            isLoggedIn = false;
+            cout << "\n[Sukses] Berhasil keluar dari panel admin.\n"; tungguEnter(); break;
         default: cout << "[!] Pilihan salah!\n"; tungguEnter();
     }
 }
 
-void tampilkanKatalogToko() {
+// 1. List Barang Toko
+void tampilkanListBarangToko() {
     bersihkanLayar();
     if (daftarTokoMarketplace.empty()) {
-        cout << "\n[!] Belum ada toko aktif.\n"; tungguEnter(); return;
+        cout << "\n[!] Belum ada toko terdaftar.\n"; tungguEnter(); return;
     }
 
-    cetakGaris(75, '=');
-    cout << left << setw(10) << "ID Toko" << setw(20) << "Nama Toko" << setw(15) << "Rating" << "Kategori" << endl;
-    cetakGaris(75, '-');
+    cout << "=== DAFTAR TOKO AKTIF ===\n";
     for (const auto& t : daftarTokoMarketplace) {
-        string rat = to_string(t.ratingToko).substr(0,3) + " (" + to_string(t.jumlahUlasan) + ")";
-        cout << left << setw(10) << t.idToko << setw(20) << t.namaToko << setw(15) << rat << t.kategoriDijual << endl;
+        cout << "- [" << t.idToko << "] " << t.namaToko << " (" << t.kategoriDijual << ")\n";
     }
-    cetakGaris(75, '=');
 
-    string namaPilihan;
-    cout << "\nKetik Nama Toko untuk melihat produknya: ";
-    cin.ignore(1000, '\n'); getline(cin, namaPilihan);
-    for (char &c : namaPilihan) c = tolower(c);
+    int idCari;
+    cout << "\nMasukkan ID Toko untuk melihat detail aset barang: "; cin >> idCari;
 
     for (const auto& t : daftarTokoMarketplace) {
-        string tLow = t.namaToko;
-        for (char &c : tLow) c = tolower(c);
-
-        if (tLow == namaPilihan) {
+        if (t.idToko == idCari) {
             bersihkanLayar();
-            cetakGaris(70, '=');
-            cout << "               PRODUK TOKO: " << t.namaToko << "\n";
-            cetakGaris(70, '=');
-            cout << left << setw(8) << "ID" << setw(25) << "Nama" << setw(15) << "Harga" << "Stok" << endl;
-            cetakGaris(70, '-');
+            cetakGaris(80, '=');
+            cout << "LIST BARANG TOKO: " << t.namaToko << "\n";
+            cetakGaris(80, '=');
+            cout << left << setw(8) << "ID" << setw(25) << "Nama Barang" << setw(15) << "Kategori" << setw(15) << "Harga Beli" << setw(12) << "Harga Jual" << "Stok" << endl;
+            cetakGaris(80, '-');
             for (const auto& p : t.daftarProduk) {
-                cout << left << setw(8) << p.id << setw(25) << p.nama << "Rp " << setw(11) << fixed << setprecision(0) << p.harga << p.stok << endl;
+                cout << left << setw(8) << p.id 
+                     << setw(25) << p.nama 
+                     << setw(15) << p.kategori 
+                     << "Rp " << setw(12) << fixed << setprecision(0) << p.hargaBeli
+                     << "Rp " << setw(9) << p.hargaJual 
+                     << p.stok << " pcs" << endl;
             }
             tungguEnter(); return;
         }
     }
-    cout << "[!] Toko tidak ditemukan.\n"; tungguEnter();
+    cout << "[!] ID Toko tidak ditemukan.\n"; tungguEnter();
 }
 
-void cariProduk() {
+// 2. Laporan & Manajemen Keuangan (Pemasukan, Pengeluaran, Pajak)
+void manajemenKeuanganToko() {
     bersihkanLayar();
-    string namaCari; cin.ignore(1000, '\n');
-    cout << "Masukkan nama produk: "; getline(cin, namaCari);
-    for(char &c : namaCari) c = tolower(c);
-    bool ditemukan = false;
-    
-    for (const auto& t : daftarTokoMarketplace) {
-        for (const auto& p : t.daftarProduk) {
-            string pLow = p.nama;
-            for(char &c : pLow) c = tolower(c);
-            if (pLow.find(namaCari) != string::npos) {
-                if (!ditemukan) {
-                    cetakGaris(60, '-');
-                    cout << left << setw(8) << "ID" << setw(25) << "Nama" << setw(15) << "Toko" << "Harga" << endl;
-                    cetakGaris(60, '-');
-                }
-                cout << left << setw(8) << p.id << setw(25) << p.nama << setw(15) << t.namaToko << "Rp " << p.harga << endl;
-                ditemukan = true;
-            }
-        }
-    }
-    if (!ditemukan) cout << "\n[!] Produk tidak ditemukan.\n";
-    tungguEnter();
-}
-
-void tambahKeKeranjang() {
-    bersihkanLayar();
-    int idCari, jml;
-    cout << "Masukkan ID barang: "; cin >> idCari;
-    cout << "Masukkan Jumlah   : "; cin >> jml;
-    
-    if(cin.fail() || jml <= 0){
-        cin.clear(); cin.ignore(1000,'\n');
-        cout << "[!] Input tidak valid.\n"; tungguEnter(); return;
-    }
-
-    for (auto& t : daftarTokoMarketplace) {
-        for (auto& p : t.daftarProduk) {
-            if (p.id == idCari) {
-                if (p.stok >= jml) {
-                    keranjangBelanja.push_back({t.namaToko, p, jml});
-                    p.stok -= jml; 
-                    cout << "\n[Sukses] Berhasil masuk keranjang!\n";
-                    tungguEnter(); return;
-                } else {
-                    cout << "\n[!] Stok kurang! Sisa: " << p.stok << endl;
-                    tungguEnter(); return;
-                }
-            }
-        }
-    }
-    cout << "\n[!] ID Salah.\n"; tungguEnter();
-}
-
-void lihatKeranjangDanCheckout() {
-    bersihkanLayar();
-    if (keranjangBelanja.empty()) { cout << "\n[!] Keranjang kosong.\n"; tungguEnter(); return; }
-
-    cetakGaris(60, '=');
-    cout << "                    KERANJANG BELANJA\n";
-    cetakGaris(60, '=');
-    double total = 0;
-    for (size_t i = 0; i < keranjangBelanja.size(); ++i) {
-        double sub = keranjangBelanja[i].produk.harga * keranjangBelanja[i].jumlah;
-        total += sub;
-        cout << i + 1 << ". [" << keranjangBelanja[i].dariToko << "] " << left << setw(20) << keranjangBelanja[i].produk.nama << " x" << keranjangBelanja[i].jumlah << " = Rp " << sub << endl;
-    }
-    cetakGaris(60, '-');
-    cout << " Total Tagihan : Rp " << fixed << setprecision(0) << total << endl;
-    char konf; cout << "\nCheckout sekarang? (y/n): "; cin >> konf;
-
-    if (konf == 'y' || konf == 'Y') {
-        cout << "\n[Sukses] Checkout berhasil! Dikirim ke: " << userLogin.alamat << endl;
-        keranjangBelanja.clear(); 
-    } else cout << "\nCheckout dibatalkan.\n";
-    tungguEnter();
-}
-
-void berikanUlasanToko() {
-    bersihkanLayar();
-    int idT; double rat;
+    int idT;
+    cout << "=== MANAJEMEN KEUANGAN TOKO ===\n";
     cout << "Masukkan ID Toko: "; cin >> idT;
 
-    for(auto& t : daftarTokoMarketplace) {
-        if(t.idToko == idT) {
-            cout << "Rating Toko (1.0 - 5.0): "; cin >> rat;
-            if(rat < 1.0 || rat > 5.0 || cin.fail()) {
-                cin.clear(); cin.ignore(1000, '\n');
-                cout << "[!] Rating salah.\n"; tungguEnter(); return;
-            }
-            t.ratingToko = ((t.ratingToko * t.jumlahUlasan) + rat) / (t.jumlahUlasan + 1);
-            t.jumlahUlasan++;
-            cout << "[Sukses] Ulasan disimpan!\n"; tungguEnter(); return;
-        }
-    }
-    cout << "[!] Toko tidak ada.\n"; tungguEnter();
-}
-
-// ==========================================
-//          SISTEM PANEL ADMIN
-// ==========================================
-void menuManajemenTokoAdmin() {
-    int pil;
-    do {
-        bersihkanLayar();
-        cout << "=== PANEL MANAJEMEN ADMIN ===\n";
-        cout << "1. Cek Total Aset\n2. Tambah Toko\n3. Hapus Toko\n4. Tambah Produk\n5. Restock Stok\n6. Kurang Stok\n7. Hapus Produk\n8. Keluar Panel\nPilih: "; cin >> pil;
-
-        if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); continue; }
-        switch (pil) {
-            case 1: hitungTotalAset(); break;
-            case 2: tambahTokoBaru(); break;
-            case 3: hapusToko(); break;
-            case 4: tambahProdukKeToko(); break;
-            case 5: updateStokMasuk(); break;
-            case 6: updateStokKeluar(); break;
-            case 7: hapusProduk(); break;
-        }
-    } while (pil != 8);
-}
-
-void hitungTotalAset() {
-    bersihkanLayar();
-    double totalAset = 0; int totalBarang = 0;
-    cout << "=== LAPORAN ASET GLOBAL ===\n\n";
-    for (const auto& t : daftarTokoMarketplace) {
-        cout << " * Toko: " << t.namaToko << "\n";
-        for (const auto& p : t.daftarProduk) {
-            totalAset += (p.harga * p.stok); totalBarang += p.stok;
-            cout << "   - " << left << setw(20) << p.nama << " Stok: " << p.stok << endl;
-        }
-    }
-    cout << "\n Total Toko  : " << daftarTokoMarketplace.size() << endl;
-    cout << " Total Stok  : " << totalBarang << " pcs\n";
-    cout << " Nilai Aset  : Rp " << fixed << setprecision(0) << totalAset << endl;
-    tungguEnter();
-}
-
-void tambahTokoBaru() {
-    bersihkanLayar(); Toko t;
-    cout << "ID Toko (Angka): "; cin >> t.idToko;
-    cin.ignore(1000, '\n');
-    cout << "Nama Toko      : "; getline(cin, t.namaToko);
-    cout << "Kategori Toko  : "; getline(cin, t.kategoriDijual);
-    t.ratingToko = 0.0; t.jumlahUlasan = 0;
-    daftarTokoMarketplace.push_back(t);
-    cout << "\nToko berhasil terdaftar.\n"; tungguEnter();
-}
-
-void hapusToko() {
-    bersihkanLayar(); int id;
-    cout << "Masukkan ID Toko: "; cin >> id;
-    for (auto it = daftarTokoMarketplace.begin(); it != daftarTokoMarketplace.end(); ++it) {
-        if (it->idToko == id) {
-            daftarTokoMarketplace.erase(it);
-            cout << "[Sukses] Toko dihapus.\n"; tungguEnter(); return;
-        }
-    }
-    cout << "[!] Gagal.\n"; tungguEnter();
-}
-
-void tambahProdukKeToko() {
-    bersihkanLayar(); int idT;
-    cout << "Masukkan ID Toko: "; cin >> idT;
     for (auto& t : daftarTokoMarketplace) {
         if (t.idToko == idT) {
-            Produk p;
-            cout << "ID Produk: "; cin >> p.id;
-            cin.ignore(1000, '\n');
-            cout << "Nama     : "; getline(cin, p.nama);
-            cout << "Kategori : "; getline(cin, p.kategori);
-            cout << "Harga    : "; cin >> p.harga;
-            cout << "Stok     : "; cin >> p.stok;
-            t.daftarProduk.push_back(p);
-            cout << "\nProduk ditambahkan.\n"; tungguEnter(); return;
+            bersihkanLayar();
+            cetakGaris(50, '=');
+            cout << "      LAPORAN KEUANGAN TOKO: " << t.namaToko << "\n";
+            cetakGaris(50, '=');
+            cout << " Saldo Kas Toko Saat Ini : Rp " << fixed << setprecision(0) << t.keuangan.saldoKas << endl;
+            cout << " Total Pemasukan Bersih  : Rp " << t.keuangan.totalPemasukan << endl;
+            cout << " Total Pengeluaran       : Rp " << t.keuangan.totalPengeluaran << endl;
+            cout << " Alokasi Pajak (11%)     : Rp " << t.keuangan.totalPajak << endl;
+            cetakGaris(50, '-');
+            
+            cout << "\n[PILIHAN MANAJEMEN KAS]\n";
+            cout << "1. Suntik Modal / Tambah Kas Toko\n";
+            cout << "2. Tarik Tunai Kas / Profit Toko\n";
+            cout << "3. Kembali ke Menu\n";
+            cout << "Pilih tindakan (1-3): ";
+            int aksi; cin >> aksi;
+
+            double nominal;
+            if (aksi == 1) {
+                cout << "Masukkan jumlah Dana Suntikan: Rp "; cin >> nominal;
+                if(nominal > 0) {
+                    t.keuangan.saldoKas += nominal;
+                    cout << "[Sukses] Kas toko berhasil bertambah.\n";
+                }
+            } else if (aksi == 2) {
+                cout << "Masukkan jumlah Penarikan Dana: Rp "; cin >> nominal;
+                if(nominal <= t.keuangan.saldoKas && nominal > 0) {
+                    t.keuangan.saldoKas -= nominal;
+                    cout << "[Sukses] Penarikan kas berhasil dilakukan.\n";
+                } else {
+                    cout << "[!] Saldo kas toko tidak mencukupi.\n";
+                }
+            }
+            tungguEnter(); return;
         }
     }
     cout << "[!] ID Toko salah.\n"; tungguEnter();
 }
 
-void updateStokMasuk() {
-    bersihkanLayar(); int idP, jml;
-    cout << "Masukkan ID Produk: "; cin >> idP;
-    for (auto& t : daftarTokoMarketplace) {
-        for (auto& p : t.daftarProduk) {
-            if (p.id == idP) {
-                cout << "Jumlah Stok Masuk: "; cin >> jml;
-                if(jml > 0) p.stok += jml;
-                cout << "[Sukses] Stok bertambah.\n"; tungguEnter(); return;
-            }
+// 3. Pengecekan Alamat User yang Memesan
+void cekAlamatPemesan() {
+    bersihkanLayar();
+    cout << "=== DAFTAR ALAMAT USER YANG MEMESAN ===\n";
+    cetakGaris(85, '=');
+    cout << left << setw(15) << "Nama User" << setw(35) << "Alamat Pengiriman" << setw(20) << "Produk Terpesan" << "Qty" << endl;
+    cetakGaris(85, '-');
+    
+    if(riwayatPesanan.empty()) {
+        cout << "                 Belum ada data pesanan masuk ke toko.\n";
+    } else {
+        for(const auto& rp : riwayatPesanan) {
+            cout << left << setw(15) << rp.namaPembeli 
+                 << setw(35) << rp.alamatPembeli 
+                 << setw(20) << rp.namaProduk 
+                 << rp.jumlah << " pcs" << endl;
         }
     }
-    cout << "[!] ID salah.\n"; tungguEnter();
+    cetakGaris(85, '=');
+    tungguEnter();
 }
 
-void updateStokKeluar() {
-    bersihkanLayar(); int idP, jml;
+// 4. Update Stok Pemasukan per Toko (Restock Dagangan)
+void updateStokPemasukan() {
+    bersihkanLayar(); 
+    int idP, jml;
+    cout << "=== UPDATE STOK PEMASUKAN (RESTOCK) ===\n";
     cout << "Masukkan ID Produk: "; cin >> idP;
+    
     for (auto& t : daftarTokoMarketplace) {
         for (auto& p : t.daftarProduk) {
             if (p.id == idP) {
-                cout << "Jumlah Buang Stok: "; cin >> jml;
-                if (p.stok >= jml && jml > 0) p.stok -= jml;
-                cout << "[Sukses] Stok dikurangi.\n"; tungguEnter(); return;
+                cout << "Produk Ditemukan: " << p.nama << " (Stok saat ini: " << p.stok << ")\n";
+                cout << "Jumlah Stok Masuk Baru: "; cin >> jml;
+                
+                if(jml > 0) {
+                    double totalBiaya = p.hargaBeli * jml;
+                    if(t.keuangan.saldoKas >= totalBiaya) {
+                        p.stok += jml;
+                        t.keuangan.saldoKas -= totalBiaya; 
+                        t.keuangan.totalPengeluaran += totalBiaya; 
+                        
+                        cout << "\n[Sukses] Restock berhasil!\n";
+                        cout << "Kas toko berkurang sebesar Rp " << fixed << setprecision(0) << totalBiaya << " untuk biaya beli barang.\n";
+                    } else {
+                        cout << "\n[!] Gagal! Saldo kas toko tidak cukup untuk membeli stok baru.\n";
+                        cout << "Dibutuhkan: Rp " << totalBiaya << " | Kas Toko: Rp " << t.keuangan.saldoKas << endl;
+                    }
+                }
+                tungguEnter(); return;
             }
         }
     }
-    cout << "[!] ID salah.\n"; tungguEnter();
+    cout << "[!] ID Produk tidak valid.\n"; tungguEnter();
+}
+
+// 5. Update Stok Pengeluaran per Toko (Retur / Barang Rusak / Terjual)
+void updateStokPengeluaran() {
+    bersihkanLayar(); 
+    int idP, jml;
+    cout << "=== UPDATE STOK PENGELUARAN (PENGURANGAN) ===\n";
+    cout << "Masukkan ID Produk: "; cin >> idP;
+    
+    for (auto& t : daftarTokoMarketplace) {
+        for (auto& p : t.daftarProduk) {
+            if (p.id == idP) {
+                cout << "Produk Ditemukan: " << p.nama << " (Stok saat ini: " << p.stok << ")\n";
+                cout << "1. Pengurangan karena Terjual (Menghasilkan Uang)\n";
+                cout << "2. Pengurangan karena Rusak/Retur/Kedaluwarsa (Rugi)\n";
+                cout << "Pilih Alasan Pengeluaran (1-2): "; 
+                int alasan; cin >> alasan;
+                
+                cout << "Jumlah Stok Keluar: "; cin >> jml;
+                
+                if (p.stok >= jml && jml > 0) {
+                    p.stok -= jml;
+                    if (alasan == 1) {
+                        double pendapatan_bruto = p.hargaJual * jml;
+                        double pajak = pendapatan_bruto * 0.11; // Simulasi Pajak 11%
+                        double neto = pendapatan_bruto - pajak;
+                        
+                        t.keuangan.saldoKas += neto;
+                        t.keuangan.totalPemasukan += neto;
+                        t.keuangan.totalPajak += pajak;
+                        
+                        cout << "\n[Sukses] Stok dikurangi karena penjualan.\n";
+                        cout << "Kas masuk (bersih setelah pajak 11%): +Rp " << fixed << setprecision(0) << neto << endl;
+                    } else {
+                        cout << "\n[Sukses] Stok dikurangi tanpa pemasukan (Kategori kerugian/rusak).\n";
+                    }
+                } else {
+                    cout << "\n[!] Jumlah pengeluaran tidak valid atau stok tidak cukup.\n";
+                }
+                tungguEnter(); return;
+            }
+        }
+    }
+    cout << "[!] ID Produk tidak valid.\n"; tungguEnter();
+}
+
+// ==========================================
+//          SISTEM STRUKTUR TOKO
+// ==========================================
+void panelManajemenToko() {
+    int pil;
+    do {
+        bersihkanLayar();
+        cout << "=== PANEL REGISTRASI STRUKTUR TOKO ===\n";
+        cout << "1. Tambah Toko Baru\n2. Hapus Toko Lama\n3. Daftarkan Produk Baru Ke Toko\n4. Hapus Produk Dari Toko\n5. Kembali ke Panel Utama\nPilih tindakan: "; cin >> pil;
+
+        if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); continue; }
+        switch (pil) {
+            case 1: tambahTokoBaru(); break;
+            case 2: hapusToko(); break;
+            case 3: tambahProdukKeToko(); break;
+            case 4: hapusProduk(); break;
+        }
+    } while (pil != 5);
+}
+
+void tambahTokoBaru() {
+    bersihkanLayar(); Toko t;
+    cout << "ID Toko Baru (Angka): "; cin >> t.idToko;
+    cin.ignore(1000, '\n');
+    cout << "Nama Toko Baru      : "; getline(cin, t.namaToko);
+    cout << "Kategori Utama Jual : "; getline(cin, t.kategoriDijual);
+    
+    // Set keuangan dasar toko baru
+    t.ratingToko = 5.0; t.jumlahUlasan = 0;
+    t.keuangan = {0, 0, 0, 0}; // Kas mula-mula kosong
+    
+    daftarTokoMarketplace.push_back(t);
+    cout << "\n[Sukses] Toko baru berhasil didaftarkan ke jaringan.\n"; tungguEnter();
+}
+
+void hapusToko() {
+    bersihkanLayar(); int id;
+    cout << "Masukkan ID Toko yang mau dihapus: "; cin >> id;
+    for (auto it = daftarTokoMarketplace.begin(); it != daftarTokoMarketplace.end(); ++it) {
+        if (it->idToko == id) {
+            daftarTokoMarketplace.erase(it);
+            cout << "[Sukses] Jaringan toko berhasil dihapus dari sistem.\n"; tungguEnter(); return;
+        }
+    }
+    cout << "[!] Gagal menghapus. ID Toko tidak valid.\n"; tungguEnter();
+}
+
+void tambahProdukKeToko() {
+    bersihkanLayar(); int idT;
+    cout << "Masukkan ID Toko tujuan: "; cin >> idT;
+    for (auto& t : daftarTokoMarketplace) {
+        if (t.idToko == idT) {
+            Produk p;
+            cout << "ID Produk Baru (Angka): "; cin >> p.id;
+            cin.ignore(1000, '\n');
+            cout << "Nama Barang           : "; getline(cin, p.nama);
+            cout << "Kategori Barang       : "; getline(cin, p.kategori);
+            cout << "Harga Modal (Beli)    : Rp "; cin >> p.hargaBeli;
+            cout << "Harga Jual Konsumen   : Rp "; cin >> p.hargaJual;
+            cout << "Stok Awal             : "; cin >> p.stok;
+            t.daftarProduk.push_back(p);
+            cout << "\n[Sukses] Produk terintegrasi ke dalam toko.\n"; tungguEnter(); return;
+        }
+    }
+    cout << "[!] ID Toko salah.\n"; tungguEnter();
 }
 
 void hapusProduk() {
     bersihkanLayar(); int idP;
-    cout << "Masukkan ID Produk: "; cin >> idP;
+    cout << "Masukkan ID Produk yang mau dihapus: "; cin >> idP;
     for (auto& t : daftarTokoMarketplace) {
         for (auto it = t.daftarProduk.begin(); it != t.daftarProduk.end(); ++it) {
             if (it->id == idP) {
                 t.daftarProduk.erase(it);
-                cout << "[Sukses] Produk terhapus.\n"; tungguEnter(); return;
+                cout << "[Sukses] SKU Produk berhasil ditiadakan.\n"; tungguEnter(); return;
             }
         }
     }
-    cout << "[!] ID salah.\n"; tungguEnter();
+    cout << "[!] ID Produk tidak ditemukan.\n"; tungguEnter();
 }
