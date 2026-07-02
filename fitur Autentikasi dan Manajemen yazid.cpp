@@ -177,7 +177,7 @@ void menuAutentikasi() {
     bersihkanLayar();
     int pilihan;
 
-    cout << "\033[1;36m";
+    cout << "\033[1;36m";//warna kode ascii
     cout << "=========================================================================\n";
     cout << "  ____ _____ ____    _    _   _       _   _ _   _ ____  \n";
     cout << " / ___| ____|  _ \\  / \\  | \\ | |     | | | | | | | __ ) \n";
@@ -193,26 +193,40 @@ void menuAutentikasi() {
     // Pilihan registrasi hanya muncul jika belum pernah registrasi
     if (!sudahRegistrasi) {
         cout << "1. Registrasi Akun Utama Admin \n";
+        cout << "2. Login Admin\n";
+        cout << "3. Keluar Aplikasi\n";
+        cetakGaris(73, '-');
+        cout << "Pilih Opsi (1-3): "; cin >> pilihan;
+
+        if (cin.fail()) {
+            cin.clear(); cin.ignore(1000, '\n');
+            cout << "[!] Input harus angka!\n"; tungguEnter(); return;
+        }
+
+        switch (pilihan) {
+            case 1: registrasiAkunToko(); break;
+            case 2: loginAkunToko(); break;
+            case 3: cout << "\nTerima kasih!\n"; exit(0);
+            default: cout << "[!] Opsi salah!\n"; tungguEnter();
+        }
     } else {
-        cout << "[INFO] Kuota Registrasi Sudah Habis / Terkunci\n1. (Registrasi Tidak Tersedia)\n";
-    }
-    cout << "2. Login Admin\n3. Keluar Aplikasi\n";
-    cetakGaris(73, '-');
-    cout << "Pilih Opsi (1-3): "; cin >> pilihan;
+        // Setelah registrasi selesai, pilihan registrasi disembunyikan sepenuhnya.
+        // Hanya tersisa 2 pilihan: Login dan Keluar Aplikasi.
+        cout << "1. Login Admin\n";
+        cout << "2. Keluar Aplikasi\n";
+        cetakGaris(73, '-');
+        cout << "Pilih Opsi (1-2): "; cin >> pilihan;
 
-    if (cin.fail()) {
-        cin.clear(); cin.ignore(1000, '\n');
-        cout << "[!] Input harus angka!\n"; tungguEnter(); return;
-    }
+        if (cin.fail()) {
+            cin.clear(); cin.ignore(1000, '\n');
+            cout << "[!] Input harus angka!\n"; tungguEnter(); return;
+        }
 
-    switch (pilihan) {
-        case 1: 
-            if (!sudahRegistrasi) registrasiAkunToko(); 
-            else { cout << "[!] Anda sudah meregistrasi akun sebelumnya!\n"; tungguEnter(); }
-            break;
-        case 2: loginAkunToko(); break;
-        case 3: cout << "\nTerima kasih!\n"; exit(0);
-        default: cout << "[!] Opsi salah!\n"; tungguEnter();
+        switch (pilihan) {
+            case 1: loginAkunToko(); break;
+            case 2: cout << "\nTerima kasih!\n"; exit(0);
+            default: cout << "[!] Opsi salah!\n"; tungguEnter();
+        }
     }
 }
 
