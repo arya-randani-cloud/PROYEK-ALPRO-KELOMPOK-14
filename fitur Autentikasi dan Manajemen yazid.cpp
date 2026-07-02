@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cctype>
+#include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -57,7 +59,7 @@ struct PesananMasuk {
 // ==========================================
 vector<User> databaseUser;
 vector<Toko> daftarTokoMarketplace;
-vector<PesananMasuk> riwayatPesanan; // Untuk pengecekan alamat pemesan
+vector<PesananMasuk> riwayatPesanan; // Untuk pengecekan alamat pemesan & barang dibeli
 
 User userLogin; 
 bool isLoggedIn = false;
@@ -70,6 +72,8 @@ void inisialisasiMarketplace();
 void bersihkanLayar();
 void tungguEnter();
 void cetakGaris(int panjang, char simbol);
+string toLowerStr(string s);
+bool mengandung(const string& teks, const string& keyword);
 
 void menuAutentikasi();
 void registrasiAkunToko();
@@ -81,6 +85,18 @@ void manajemenKeuanganToko();
 void cekAlamatPemesan();
 void updateStokPemasukan();
 void updateStokPengeluaran();
+
+// FITUR KATALOG & TAMPILAN UTAMA
+void katalogUtamaMarketplace();
+void tampilkanSemuaProdukKatalog();
+void cariProdukKatalog();
+void filterProdukPerKategori();
+
+// FITUR PENGECEKAN BARANG YANG DIBELI
+void cekBarangDibeli();
+void tampilkanSemuaRiwayatBeli();
+void cariBarangDibeliPerNama();
+void rekapTotalBarangTerjual();
 
 // PANEL MANAJEMEN STRUKTUR TOKO
 void panelManajemenToko();
@@ -123,6 +139,17 @@ void cetakGaris(int panjang, char simbol) {
     cout << endl;
 }
 
+// Ubah string menjadi huruf kecil semua (untuk pencarian case-insensitive)
+string toLowerStr(string s) {
+    for (auto &c : s) c = tolower((unsigned char)c);
+    return s;
+}
+
+// Cek apakah "teks" mengandung "keyword" (case-insensitive)
+bool mengandung(const string& teks, const string& keyword) {
+    return toLowerStr(teks).find(toLowerStr(keyword)) != string::npos;
+}
+
 void inisialisasiMarketplace() {
     // Data Default Toko & Keuangan Awal
     Toko uniqlo = {101, "uniqlo", "pakaian", 4.8, 1, {5000000, 1500000, 500000, 165000}, {
@@ -138,7 +165,7 @@ void inisialisasiMarketplace() {
     daftarTokoMarketplace.push_back(uniqlo);
     daftarTokoMarketplace.push_back(holland);
 
-    // Simulasi Pesanan Masuk (untuk cek alamat pemesan)
+    // Simulasi Pesanan Masuk (untuk cek alamat pemesan & barang dibeli)
     riwayatPesanan.push_back({"Budi Santoso", "Jl. Merdeka No. 45, Jakarta", "uniqlo", "Kemeja Polos", 2, 250000});
     riwayatPesanan.push_back({"Siti Aminah", "Jl. Anggrek Raya No. 12, Bandung", "holland bakery", "Roti Cokelat", 5, 60000});
 }
@@ -240,12 +267,14 @@ void menuUtamaAdmin() {
     cout << "          ADMIN TOKO CERAN_HUB\n";
     cetakGaris(50, '=');
     cout << "1. List Barang per Toko\n";
-    cout << "2. Laporan & Manajemen Keuangan Toko\n";
-    cout << "3. Pengecekan Alamat User (Pemesan)\n";
-    cout << "4. Update Stok Pemasukan (Restock Toko)\n";
-    cout << "5. Update Stok Pengeluaran (Buang/Retur Barang)\n";
-    cout << "6. Pengaturan Struktur Toko & Produk (Tambah/Hapus)\n";
-    cout << "7. Logout Kendali\n";
+    cout << "2. Katalog & Tampilan Utama Marketplace\n";
+    cout << "3. Laporan & Manajemen Keuangan Toko\n";
+    cout << "4. Pengecekan Alamat User (Pemesan)\n";
+    cout << "5. Pengecekan Barang yang Dibeli\n";
+    cout << "6. Update Stok Pemasukan (Restock Toko)\n";
+    cout << "7. Update Stok Pengeluaran (Buang/Retur Barang)\n";
+    cout << "8. Pengaturan Struktur Toko & Produk (Tambah/Hapus)\n";
+    cout << "9. Logout Kendali\n";
     cetakGaris(50, '-');
     cout << "Pilih menu: "; cin >> pilihan;
 
@@ -256,12 +285,14 @@ void menuUtamaAdmin() {
 
     switch (pilihan) {
         case 1: tampilkanListBarangToko(); break;
-        case 2: manajemenKeuanganToko(); break;
-        case 3: cekAlamatPemesan(); break;
-        case 4: updateStokPemasukan(); break;
-        case 5: updateStokPengeluaran(); break;
-        case 6: panelManajemenToko(); break;
-        case 7:
+        case 2: katalogUtamaMarketplace(); break;
+        case 3: manajemenKeuanganToko(); break;
+        case 4: cekAlamatPemesan(); break;
+        case 5: cekBarangDibeli(); break;
+        case 6: updateStokPemasukan(); break;
+        case 7: updateStokPengeluaran(); break;
+        case 8: panelManajemenToko(); break;
+        case 9:
             isLoggedIn = false;
             cout << "\n[Sukses] Berhasil keluar dari panel admin.\n"; tungguEnter(); break;
         default: cout << "[!] Pilihan salah!\n"; tungguEnter();
@@ -303,6 +334,174 @@ void tampilkanListBarangToko() {
         }
     }
     cout << "[!] ID Toko tidak ditemukan.\n"; tungguEnter();
+}
+
+// ==========================================
+//     FITUR KATALOG & TAMPILAN UTAMA
+// ==========================================
+
+// Menu utama fitur katalog
+void katalogUtamaMarketplace() {
+    int pil;
+    do {
+        bersihkanLayar();
+        cout << "\033[1;35m";
+        cetakGaris(73, '=');
+        cout << "         KATALOG & TAMPILAN UTAMA MARKETPLACE CERAN_HUB\n";
+        cetakGaris(73, '=');
+        cout << "\033[0m";
+
+        // Ringkasan singkat: total toko & total produk se-marketplace
+        int totalProduk = 0;
+        for (const auto& t : daftarTokoMarketplace) totalProduk += (int)t.daftarProduk.size();
+        cout << "Total Toko Terdaftar : " << daftarTokoMarketplace.size() << " toko\n";
+        cout << "Total Produk Beredar : " << totalProduk << " item\n";
+        cetakGaris(73, '-');
+
+        cout << "1. Tampilkan Semua Produk (Semua Toko)\n";
+        cout << "2. Cari Produk Berdasarkan Nama\n";
+        cout << "3. Filter Produk Berdasarkan Kategori\n";
+        cout << "4. Kembali ke Menu Utama\n";
+        cetakGaris(73, '-');
+        cout << "Pilih menu (1-4): "; cin >> pil;
+
+        if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); pil = 0; continue; }
+
+        switch (pil) {
+            case 1: tampilkanSemuaProdukKatalog(); break;
+            case 2: cariProdukKatalog(); break;
+            case 3: filterProdukPerKategori(); break;
+            case 4: break;
+            default: cout << "[!] Pilihan salah!\n"; tungguEnter();
+        }
+    } while (pil != 4);
+}
+
+// 2.1 Tampilkan seluruh produk dari seluruh toko sebagai "halaman utama" marketplace
+void tampilkanSemuaProdukKatalog() {
+    bersihkanLayar();
+    cetakGaris(95, '=');
+    cout << "                         ETALASE PRODUK - SEMUA TOKO\n";
+    cetakGaris(95, '=');
+
+    if (daftarTokoMarketplace.empty()) {
+        cout << "[!] Belum ada toko/produk yang tersedia di marketplace.\n"; tungguEnter(); return;
+    }
+
+    cout << left << setw(18) << "Toko" << setw(22) << "Nama Produk" << setw(15) << "Kategori" 
+         << setw(14) << "Harga Jual" << setw(10) << "Stok" << "Status" << endl;
+    cetakGaris(95, '-');
+
+    bool adaProduk = false;
+    for (const auto& t : daftarTokoMarketplace) {
+        for (const auto& p : t.daftarProduk) {
+            adaProduk = true;
+            string status = (p.stok > 0) ? "Tersedia" : "Habis";
+            cout << left << setw(18) << t.namaToko 
+                 << setw(22) << p.nama 
+                 << setw(15) << p.kategori 
+                 << "Rp " << setw(11) << fixed << setprecision(0) << p.hargaJual 
+                 << setw(10) << (to_string(p.stok) + " pcs")
+                 << status << endl;
+        }
+    }
+    if (!adaProduk) cout << "[!] Belum ada produk yang didaftarkan di toko manapun.\n";
+    cetakGaris(95, '=');
+    tungguEnter();
+}
+
+// 2.2 Cari produk berdasarkan nama (keyword, case-insensitive, lintas toko)
+void cariProdukKatalog() {
+    bersihkanLayar();
+    string keyword;
+    cout << "=== CARI PRODUK (KATALOG MARKETPLACE) ===\n";
+    cout << "Masukkan kata kunci nama produk: ";
+    cin.ignore(1000, '\n');
+    getline(cin, keyword);
+
+    bersihkanLayar();
+    cetakGaris(95, '=');
+    cout << "HASIL PENCARIAN UNTUK: \"" << keyword << "\"\n";
+    cetakGaris(95, '=');
+    cout << left << setw(18) << "Toko" << setw(22) << "Nama Produk" << setw(15) << "Kategori" 
+         << setw(14) << "Harga Jual" << setw(10) << "Stok" << "Status" << endl;
+    cetakGaris(95, '-');
+
+    bool ditemukan = false;
+    for (const auto& t : daftarTokoMarketplace) {
+        for (const auto& p : t.daftarProduk) {
+            if (mengandung(p.nama, keyword)) {
+                ditemukan = true;
+                string status = (p.stok > 0) ? "Tersedia" : "Habis";
+                cout << left << setw(18) << t.namaToko 
+                     << setw(22) << p.nama 
+                     << setw(15) << p.kategori 
+                     << "Rp " << setw(11) << fixed << setprecision(0) << p.hargaJual 
+                     << setw(10) << (to_string(p.stok) + " pcs")
+                     << status << endl;
+            }
+        }
+    }
+    if (!ditemukan) cout << "[!] Tidak ada produk yang cocok dengan kata kunci tersebut.\n";
+    cetakGaris(95, '=');
+    tungguEnter();
+}
+
+// 2.3 Filter produk berdasarkan kategori
+void filterProdukPerKategori() {
+    bersihkanLayar();
+
+    // Kumpulkan daftar kategori unik yang tersedia agar admin tahu pilihan apa saja
+    vector<string> kategoriUnik;
+    for (const auto& t : daftarTokoMarketplace) {
+        for (const auto& p : t.daftarProduk) {
+            bool sudahAda = false;
+            for (const auto& k : kategoriUnik) {
+                if (toLowerStr(k) == toLowerStr(p.kategori)) { sudahAda = true; break; }
+            }
+            if (!sudahAda) kategoriUnik.push_back(p.kategori);
+        }
+    }
+
+    cout << "=== FILTER PRODUK BERDASARKAN KATEGORI ===\n";
+    if (kategoriUnik.empty()) {
+        cout << "[!] Belum ada kategori produk yang tersedia.\n"; tungguEnter(); return;
+    }
+    cout << "Kategori yang tersedia saat ini:\n";
+    for (const auto& k : kategoriUnik) cout << " - " << k << "\n";
+    cetakGaris(50, '-');
+
+    string kategori;
+    cout << "Masukkan nama kategori: ";
+    cin.ignore(1000, '\n');
+    getline(cin, kategori);
+
+    bersihkanLayar();
+    cetakGaris(95, '=');
+    cout << "PRODUK DALAM KATEGORI: " << kategori << "\n";
+    cetakGaris(95, '=');
+    cout << left << setw(18) << "Toko" << setw(22) << "Nama Produk" << setw(15) << "Kategori" 
+         << setw(14) << "Harga Jual" << setw(10) << "Stok" << "Status" << endl;
+    cetakGaris(95, '-');
+
+    bool ditemukan = false;
+    for (const auto& t : daftarTokoMarketplace) {
+        for (const auto& p : t.daftarProduk) {
+            if (toLowerStr(p.kategori) == toLowerStr(kategori)) {
+                ditemukan = true;
+                string status = (p.stok > 0) ? "Tersedia" : "Habis";
+                cout << left << setw(18) << t.namaToko 
+                     << setw(22) << p.nama 
+                     << setw(15) << p.kategori 
+                     << "Rp " << setw(11) << fixed << setprecision(0) << p.hargaJual 
+                     << setw(10) << (to_string(p.stok) + " pcs")
+                     << status << endl;
+            }
+        }
+    }
+    if (!ditemukan) cout << "[!] Tidak ada produk dalam kategori tersebut.\n";
+    cetakGaris(95, '=');
+    tungguEnter();
 }
 
 // 2. Laporan & Manajemen Keuangan (Pemasukan, Pengeluaran, Pajak)
@@ -353,7 +552,7 @@ void manajemenKeuanganToko() {
     cout << "[!] ID Toko salah.\n"; tungguEnter();
 }
 
-// 3. Pengecekan Alamat User yang Memesan
+// 4. Pengecekan Alamat User yang Memesan
 void cekAlamatPemesan() {
     bersihkanLayar();
     cout << "=== DAFTAR ALAMAT USER YANG MEMESAN ===\n";
@@ -375,7 +574,132 @@ void cekAlamatPemesan() {
     tungguEnter();
 }
 
-// 4. Update Stok Pemasukan per Toko (Restock Dagangan)
+// ==========================================
+//   FITUR PENGECEKAN BARANG YANG DIBELI
+// ==========================================
+
+// Menu utama fitur pengecekan barang dibeli
+void cekBarangDibeli() {
+    int pil;
+    do {
+        bersihkanLayar();
+        cetakGaris(73, '=');
+        cout << "            PENGECEKAN BARANG YANG DIBELI (RIWAYAT TRANSAKSI)\n";
+        cetakGaris(73, '=');
+        cout << "Total Transaksi Tercatat : " << riwayatPesanan.size() << " transaksi\n";
+        cetakGaris(73, '-');
+        cout << "1. Tampilkan Semua Riwayat Barang Dibeli\n";
+        cout << "2. Cari Barang Dibeli Berdasarkan Nama Produk\n";
+        cout << "3. Rekap Total Barang Terjual per Produk\n";
+        cout << "4. Kembali ke Menu Utama\n";
+        cetakGaris(73, '-');
+        cout << "Pilih menu (1-4): "; cin >> pil;
+
+        if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); pil = 0; continue; }
+
+        switch (pil) {
+            case 1: tampilkanSemuaRiwayatBeli(); break;
+            case 2: cariBarangDibeliPerNama(); break;
+            case 3: rekapTotalBarangTerjual(); break;
+            case 4: break;
+            default: cout << "[!] Pilihan salah!\n"; tungguEnter();
+        }
+    } while (pil != 4);
+}
+
+// 5.1 Tampilkan seluruh riwayat barang yang sudah dibeli
+void tampilkanSemuaRiwayatBeli() {
+    bersihkanLayar();
+    cetakGaris(100, '=');
+    cout << "                              RIWAYAT BARANG YANG DIBELI\n";
+    cetakGaris(100, '=');
+    cout << left << setw(15) << "Pembeli" << setw(18) << "Toko" << setw(20) << "Produk Dibeli" 
+         << setw(8) << "Qty" << "Total Bayar" << endl;
+    cetakGaris(100, '-');
+
+    if (riwayatPesanan.empty()) {
+        cout << "[!] Belum ada barang yang dibeli / transaksi tercatat.\n";
+    } else {
+        double grandTotal = 0;
+        for (const auto& rp : riwayatPesanan) {
+            cout << left << setw(15) << rp.namaPembeli 
+                 << setw(18) << rp.namaToko 
+                 << setw(20) << rp.namaProduk 
+                 << setw(8) << (to_string(rp.jumlah) + " pcs")
+                 << "Rp " << fixed << setprecision(0) << rp.totalBayar << endl;
+            grandTotal += rp.totalBayar;
+        }
+        cetakGaris(100, '-');
+        cout << "Total Keseluruhan Transaksi Pembelian : Rp " << fixed << setprecision(0) << grandTotal << endl;
+    }
+    cetakGaris(100, '=');
+    tungguEnter();
+}
+
+// 5.2 Cari riwayat pembelian berdasarkan nama produk (keyword, case-insensitive)
+void cariBarangDibeliPerNama() {
+    bersihkanLayar();
+    string keyword;
+    cout << "=== CARI BARANG DIBELI BERDASARKAN NAMA PRODUK ===\n";
+    cout << "Masukkan nama produk yang dicari: ";
+    cin.ignore(1000, '\n');
+    getline(cin, keyword);
+
+    bersihkanLayar();
+    cetakGaris(100, '=');
+    cout << "HASIL PENCARIAN BARANG DIBELI UNTUK: \"" << keyword << "\"\n";
+    cetakGaris(100, '=');
+    cout << left << setw(15) << "Pembeli" << setw(18) << "Toko" << setw(20) << "Produk Dibeli" 
+         << setw(8) << "Qty" << "Total Bayar" << endl;
+    cetakGaris(100, '-');
+
+    bool ditemukan = false;
+    for (const auto& rp : riwayatPesanan) {
+        if (mengandung(rp.namaProduk, keyword)) {
+            ditemukan = true;
+            cout << left << setw(15) << rp.namaPembeli 
+                 << setw(18) << rp.namaToko 
+                 << setw(20) << rp.namaProduk 
+                 << setw(8) << (to_string(rp.jumlah) + " pcs")
+                 << "Rp " << fixed << setprecision(0) << rp.totalBayar << endl;
+        }
+    }
+    if (!ditemukan) cout << "[!] Tidak ditemukan riwayat pembelian untuk produk tersebut.\n";
+    cetakGaris(100, '=');
+    tungguEnter();
+}
+
+// 5.3 Rekap total barang terjual per produk (agregasi qty & total omzet)
+void rekapTotalBarangTerjual() {
+    bersihkanLayar();
+    cetakGaris(80, '=');
+    cout << "               REKAP TOTAL BARANG TERJUAL PER PRODUK\n";
+    cetakGaris(80, '=');
+
+    if (riwayatPesanan.empty()) {
+        cout << "[!] Belum ada data transaksi untuk direkap.\n"; tungguEnter(); return;
+    }
+
+    // Agregasi jumlah & omzet per nama produk menggunakan map
+    map<string, int> totalQty;
+    map<string, double> totalOmzet;
+    for (const auto& rp : riwayatPesanan) {
+        totalQty[rp.namaProduk] += rp.jumlah;
+        totalOmzet[rp.namaProduk] += rp.totalBayar;
+    }
+
+    cout << left << setw(25) << "Nama Produk" << setw(20) << "Total Terjual" << "Total Omzet" << endl;
+    cetakGaris(80, '-');
+    for (const auto& item : totalQty) {
+        cout << left << setw(25) << item.first 
+             << setw(20) << (to_string(item.second) + " pcs")
+             << "Rp " << fixed << setprecision(0) << totalOmzet[item.first] << endl;
+    }
+    cetakGaris(80, '=');
+    tungguEnter();
+}
+
+// 6. Update Stok Pemasukan per Toko (Restock Dagangan)
 void updateStokPemasukan() {
     bersihkanLayar(); 
     int idP, jml;
@@ -409,7 +733,7 @@ void updateStokPemasukan() {
     cout << "[!] ID Produk tidak valid.\n"; tungguEnter();
 }
 
-// 5. Update Stok Pengeluaran per Toko (Retur / Barang Rusak / Terjual)
+// 7. Update Stok Pengeluaran per Toko (Retur / Barang Rusak / Terjual)
 void updateStokPengeluaran() {
     bersihkanLayar(); 
     int idP, jml;
