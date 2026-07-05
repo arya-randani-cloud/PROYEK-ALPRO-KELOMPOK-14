@@ -2,71 +2,36 @@
 #include <iomanip>
 
 using namespace std;
-
-//====================================================================
-// CLASS EDIT VENDOR
-//====================================================================
 class EditVendor{
 
 private:
 
     string idVendor[10]={
-        "V001","V002","V003","V004","V005",
-        "V006","V007","V008","V009","V010"
+        "V001","V002","V003","V004","V005","V006","V007","V008","V009","V010"
     };
 
     string namaToko[10]={
-        "Toko Makmur",
-        "Game Store",
-        "Tech Store",
-        "FashionKu",
-        "Healthy Shop",
-        "ATK Jaya",
-        "Pet House",
-        "Baby Mart",
-        "Sport Center",
-        "Otomotif Jaya"
+        "Toko Makmur","Game Store", "Tech Store",  "FashionKu","Healthy Shop", "ATK Jaya","Pet House","Baby Mart",  "Sport Center","Otomotif Jaya"
     };
 
     string pemilik[10]={
-        "Andi","Budi","Citra","Dewi","Eko",
-        "Farhan","Gilang","Hasan","Indra","Joko"
+        "Andi","Budi","Citra","Dewi","Eko", "Farhan","Gilang","Hasan","Indra","Joko"
     };
 
     string kategori[10]={
-        "Sembako","Gaming","Elektronik","Fashion","Kesehatan",
-        "Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
+        "Sembako","Gaming","Elektronik","Fashion","Kesehatan", "Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
     };
 
     string email[10]={
-        "andi@gmail.com",
-        "budi@gmail.com",
-        "citra@gmail.com",
-        "dewi@gmail.com",
-        "eko@gmail.com",
-        "farhan@gmail.com",
-        "gilang@gmail.com",
-        "hasan@gmail.com",
-        "indra@gmail.com",
-        "joko@gmail.com"
+        "andi@gmail.com","budi@gmail.com","citra@gmail.com","dewi@gmail.com","eko@gmail.com","farhan@gmail.com","gilang@gmail.com","hasan@gmail.com","indra@gmail.com","joko@gmail.com"
     };
 
     string noHp[10]={
-        "081234567801",
-        "08123456789",
-        "081234567803",
-        "081234567804",
-        "081234567805",
-        "081234567806",
-        "081234567807",
-        "081234567808",
-        "081234567809",
-        "081234567810"
+        "081234567801","08123456789","081234567803","081234567804","081234567805","081234567806","081234567807","081234567808","081234567809","081234567810"
     };
 
     string status[10]={
-        "Aktif","Aktif","Nonaktif","Aktif","Nonaktif",
-        "Aktif","Aktif","Nonaktif","Aktif","Nonaktif"
+        "Aktif","Aktif","Nonaktif","Aktif","Nonaktif", "Aktif","Aktif","Nonaktif","Aktif","Nonaktif"
     };
 
     // variabel sementara untuk menyimpan data lama sebelum diedit
