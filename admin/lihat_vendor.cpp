@@ -22,16 +22,7 @@ private:
     };
 
     string kategori[10]={
-        "Sembako",
-        "Gaming",
-        "Elektronik",
-        "Fashion",
-        "Kesehatan",
-        "ATK",
-        "Pet Shop",
-        "Bayi",
-        "Olahraga",
-        "Otomotif"
+        "Sembako", "Gaming", "Elektronik", "Fashion", "Kesehatan", "ATK", "Pet Shop", "Bayi", "Olahraga", "Otomotif"
     };
 
     string status[10]={
