@@ -9,29 +9,17 @@ private:
     //==================== SEMBAKO ====================
 
     string sembako[5]={
-        "Beras Ramos 5 Kg",
-        "Minyak Goreng",
-        "Gula Pasir",
-        "Telur Ayam",
-        "Tepung Terigu"
+       "Beras Ramos 5 Kg", "Minyak Goreng", "Gula Pasir", "Telur Ayam", "Tepung Terigu"
     };
 
     int terjualSembako[5]={
-        320,
-        285,
-        250,
-        210,
-        180
+       320,285,250,210,180
     };
 
     //==================== GAMING ====================
 
     string gaming[5]={
-        "Mouse Logitech",
-        "Keyboard Gaming",
-        "Headset Gaming",
-        "Mousepad XL",
-        "Joystick"
+        "Mouse Logitech", "Keyboard Gaming", "Headset Gaming", "Mousepad XL", "Joystick"
     };
 
     int terjualGaming[5]={
