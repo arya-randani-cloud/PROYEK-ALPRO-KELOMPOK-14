@@ -125,12 +125,8 @@ public:
     }
 
     void hapusVendor(int idx){
-
-        // simpan data vendor yang akan dihapus untuk log aktivitas
         string idHapus=idVendor[idx];
         string namaHapus=namaToko[idx];
-
-        // geser seluruh data array ke atas
         for(int i=idx;i<jumlahVendor-1;i++){
 
             idVendor[i]=idVendor[i+1];
@@ -143,7 +139,6 @@ public:
 
         }
 
-        // kurangi jumlah vendor sebanyak satu
         jumlahVendor=jumlahVendor-1;
 
         cout<<"\n=====================================\n";
