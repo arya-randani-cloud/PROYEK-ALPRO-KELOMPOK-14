@@ -23,29 +23,17 @@ private:
     };
 
     int terjualGaming[5]={
-        160,
-        140,
-        120,
-        90,
-        80
+        160,140,120,90,80
     };
 
     //==================== ELEKTRONIK ====================
 
     string elektronik[5]={
-        "Laptop ASUS",
-        "Printer Epson",
-        "SSD 512 GB",
-        "Flashdisk 32 GB",
-        "Monitor LG"
+          "Laptop ASUS", "Printer Epson", "SSD 512 GB", "Flashdisk 32 GB", "Monitor LG"
     };
 
     int terjualElektronik[5]={
-        75,
-        62,
-        58,
-        110,
-        48
+           75,62,58,110,48
     };
 
 public:
