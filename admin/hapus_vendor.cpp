@@ -11,26 +11,17 @@ class HapusVendor{
 private:
 
     string idVendor[10]={
-        "V001","V002","V003","V004","V005",
-        "V006","V007","V008","V009","V010"
+        "V001","V002","V003","V004","V005","V006","V007","V008","V009","V010"
+        
     };
 
     string namaToko[10]={
-        "Toko Makmur",
-        "Game Store",
-        "Tech Store",
-        "FashionKu",
-        "Healthy Shop",
-        "ATK Jaya",
-        "Pet House",
-        "Baby Mart",
-        "Sport Center",
-        "Otomotif Jaya"
+       "Toko Makmur", "Game Store", "Tech Store", "FashionKu", "Healthy Shop", "ATK Jaya", "Pet House", "Baby Mart", "Sport Center", "Otomotif Jaya"
     };
 
     string pemilik[10]={
-        "Andi","Budi","Citra","Dewi","Eko",
-        "Farhan","Gilang","Hasan","Indra","Joko"
+        "Andi","Budi","Citra","Dewi","Eko","Farhan","Gilang","Hasan","Indra","Joko"
+        
     };
 
     string kategori[10]={
