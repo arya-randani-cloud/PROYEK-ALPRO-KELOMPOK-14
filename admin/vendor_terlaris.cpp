@@ -6,7 +6,6 @@ using namespace std;
 class VendorTerlaris{
 
 private:
-
     string namaToko[10]={
         "Toko Makmur",
         "Game Store",
@@ -21,16 +20,7 @@ private:
     };
 
     int transaksi[10]={
-        950,
-        880,
-        760,
-        730,
-        650,
-        580,
-        540,
-        500,
-        470,
-        430
+        950,880,760,730,650,580,540,500,470,430
     };
 
     long pendapatan[10]={
@@ -147,9 +137,7 @@ public:
     void menu(){
 
         int pilih;
-
         do{
-
             cout<<"\n========================================"<<endl;
             cout<<"        MENU VENDOR TERLARIS"<<endl;
             cout<<"========================================"<<endl;
@@ -186,21 +174,11 @@ public:
 
             default:
                 cout<<"\nPilihan tidak tersedia!\n";
-
             }
-
         }while(pilih!=0);
-
     }
-
 };
-
 int main(){
-
     VendorTerlaris admin;
-
     admin.menu();
-
-    return 0;
-
 }
