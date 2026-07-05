@@ -1,43 +1,28 @@
 #include <iostream>
 #include <iomanip>
-
 using namespace std;
-
 class CariVendor{
 
-private:
-
-    string idVendor[10]={
-        "V001","V002","V003","V004","V005",
-        "V006","V007","V008","V009","V010"
+        private:
+            string idVendor[10]={
+                "V001","V002","V003","V004","V005",
+                "V006","V007","V008","V009","V010"
     };
 
-    string namaToko[10]={
-        "Toko Makmur",
-        "Game Store",
-        "Tech Store",
-        "FashionKu",
-        "Healthy Shop",
-        "ATK Jaya",
-        "Pet House",
-        "Baby Mart",
-        "Sport Center",
-        "Otomotif Jaya"
+        string namaToko[10]={
+            "Toko Makmur","Game Store","Tech Store","FashionKu","Healthy Shop","ATK Jaya","Pet House","Baby Mart","Sport Center", "Otomotif Jaya"
     };
 
     string pemilik[10]={
-        "Andi","Budi","Citra","Dewi","Eko",
-        "Farhan","Gilang","Hasan","Indra","Joko"
+        "Andi","Budi","Citra","Dewi","Eko","Farhan","Gilang","Hasan","Indra","Joko"
     };
 
     string kategori[10]={
-        "Sembako","Gaming","Elektronik","Fashion","Kesehatan",
-        "ATK","Pet Shop","Bayi","Olahraga","Otomotif"
+        "Sembako","Gaming","Elektronik","Fashion","Kesehatan","ATK","Pet Shop","Bayi","Olahraga","Otomotif"
     };
 
     string status[10]={
-        "Aktif","Aktif","Aktif","Aktif","Aktif",
-        "Aktif","Nonaktif","Aktif","Nonaktif","Aktif"
+        "Aktif","Aktif","Aktif","Aktif","Aktif","Aktif","Nonaktif","Aktif","Nonaktif","Aktif"
     };
 
 public:
