@@ -8,15 +8,11 @@ class PendapatanMall{
 private:
 
     string bulan[12]={
-        "Januari","Februari","Maret","April",
-        "Mei","Juni","Juli","Agustus",
-        "September","Oktober","November","Desember"
+       "Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"
     };
 
     int transaksi[12]={
-        1250,1380,1525,1460,
-        1700,1850,1940,1810,
-        1680,1750,2100,2500
+       1250,1380,1525,1460,1700,1850,1940,1810,1680,1750,2100,2500
     };
 
     long pendapatan[12]={
