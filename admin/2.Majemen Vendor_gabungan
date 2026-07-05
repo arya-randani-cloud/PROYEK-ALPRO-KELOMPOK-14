@@ -2,133 +2,89 @@
 #include <iomanip>
 
 using namespace std;
-
-//====================================================================
-// CLASS UTAMA: MANAJEMEN VENDOR
-// Menggabungkan seluruh fitur (Lihat, Tambah, Cari, Edit, Hapus)
-// menjadi satu class yang memakai array data vendor yang SAMA,
-// sehingga setiap perubahan langsung terlihat di semua fitur lain.
-//====================================================================
 class ManajemenVendor{
 
-private:
-
-    string idVendor[100];
-    string namaToko[100];
-    string namaPemilik[100];
-    string kategori[100];
-    string email[100];
-    string noHP[100];
-    string status[100];
-    int jumlahProduk[100];
-    float rating[100];
-
-    int jumlahVendor;
-
-    // variabel sementara untuk menyimpan data lama sebelum diedit
-    string namaTokoLama;
-    string pemilikLama;
-    string kategoriLama;
-    string emailLama;
-    string hpLama;
-    string statusLama;
-
-public:
-
-    // Constructor, isi data awal 10 vendor
-    ManajemenVendor(){
-
-        jumlahVendor=10;
-
-        string idAwal[10]={
-            "V001","V002","V003","V004","V005",
-            "V006","V007","V008","V009","V010"
-        };
-
-        string tokoAwal[10]={
-            "Toko Makmur",
-            "Game Store",
-            "Tech Store",
-            "FashionKu",
-            "Healthy Shop",
-            "ATK Jaya",
-            "Pet House",
-            "Baby Mart",
-            "Sport Center",
-            "Otomotif Jaya"
-        };
-
-        string pemilikAwal[10]={
-            "Andi","Budi","Citra","Dewi","Eko",
-            "Farhan","Gilang","Hasan","Indra","Joko"
-        };
-
-        string kategoriAwal[10]={
-            "Sembako","Gaming","Elektronik","Fashion","Kesehatan",
-            "Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
-        };
-
-        string emailAwal[10]={
-            "andi@gmail.com",
-            "budi@gmail.com",
-            "citra@gmail.com",
-            "dewi@gmail.com",
-            "eko@gmail.com",
-            "farhan@gmail.com",
-            "gilang@gmail.com",
-            "hasan@gmail.com",
-            "indra@gmail.com",
-            "joko@gmail.com"
-        };
-
-        string hpAwal[10]={
-            "081234567801",
-            "08123456789",
-            "081234567803",
-            "081234567804",
-            "081234567805",
-            "081234567806",
-            "081234567807",
-            "081234567808",
-            "081234567809",
-            "081234567810"
-        };
-
-        string statusAwal[10]={
-            "Aktif","Aktif","Nonaktif","Aktif","Nonaktif",
-            "Aktif","Aktif","Nonaktif","Aktif","Nonaktif"
-        };
-
-        int produkAwal[10]={
-            35,28,40,25,18,
-            20,15,16,22,19
-        };
-
-        float ratingAwal[10]={
-            4.9,4.8,4.7,4.8,4.6,
-            4.5,4.3,4.4,4.2,4.6
-        };
-
-        for(int i=0;i<10;i++){
-
-            idVendor[i]=idAwal[i];
-            namaToko[i]=tokoAwal[i];
-            namaPemilik[i]=pemilikAwal[i];
-            kategori[i]=kategoriAwal[i];
-            email[i]=emailAwal[i];
-            noHP[i]=hpAwal[i];
-            status[i]=statusAwal[i];
-            jumlahProduk[i]=produkAwal[i];
-            rating[i]=ratingAwal[i];
-
-        }
-
-    }
-
-    //================================================================
+                private:
+                
+                    string idVendor[100];
+                    string namaToko[100];
+                    string namaPemilik[100];
+                    string kategori[100];
+                    string email[100];
+                    string noHP[100];
+                    string status[100];
+                    int jumlahProduk[100];
+                    float rating[100];
+                
+                    int jumlahVendor;
+                
+                    // variabel sementara untuk menyimpan data lama sebelum diedit
+                    string namaTokoLama;
+                    string pemilikLama;
+                    string kategoriLama;
+                    string emailLama;
+                    string hpLama;
+                    string statusLama;
+                
+                public:
+                    ManajemenVendor(){
+                
+                        jumlahVendor=10;
+                
+                        string idAwal[10]={
+                            "V001","V002","V003","V004","V005", "V006","V007","V008","V009","V010"
+                        };
+                
+                        string tokoAwal[10]={
+                            "Toko Makmur", "Game Store", "Tech Store", "FashionKu", "Healthy Shop", "ATK Jaya", "Pet House", "Baby Mart", "Sport Center", "Otomotif Jaya"
+                        };
+                
+                        string pemilikAwal[10]={
+                            "Andi","Budi","Citra","Dewi","Eko","Farhan","Gilang","Hasan","Indra","Joko"
+                        };
+                
+                        string kategoriAwal[10]={
+                            "Sembako","Gaming","Elektronik","Fashion","Kesehatan", "Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
+                        };
+                
+                        string emailAwal[10]={
+                           "andi@gmail.com","budi@gmail.com","citra@gmail.com","dewi@gmail.com","eko@gmail.com","farhan@gmail.com","gilang@gmail.com","hasan@gmail.com","indra@gmail.com","joko@gmail.com"
+                        };
+                
+                        string hpAwal[10]={
+                            "081234567801","08123456789","081234567803","081234567804","081234567805","081234567806","081234567807","081234567808","081234567809","081234567810"
+                        };
+                
+                        string statusAwal[10]={
+                            "Aktif","Aktif","Nonaktif","Aktif","Nonaktif","Aktif","Aktif","Nonaktif","Aktif","Nonaktif"
+                            
+                        };
+                
+                        int produkAwal[10]={
+                            35,28,40,25,18, 20,15,16,22,19
+                           
+                        };
+                
+                        float ratingAwal[10]={
+                            4.9,4.8,4.7,4.8,4.6,4.5,4.3,4.4,4.2,4.6
+                            
+                        };
+                
+                        for(int i=0;i<10;i++){
+                
+                            idVendor[i]=idAwal[i];
+                            namaToko[i]=tokoAwal[i];
+                            namaPemilik[i]=pemilikAwal[i];
+                            kategori[i]=kategoriAwal[i];
+                            email[i]=emailAwal[i];
+                            noHP[i]=hpAwal[i];
+                            status[i]=statusAwal[i];
+                            jumlahProduk[i]=produkAwal[i];
+                            rating[i]=ratingAwal[i];
+                
+                        }
+                         }
     // FUNGSI BANTU (dipakai bersama oleh beberapa fitur)
-    //================================================================
-
     // Cari indeks vendor berdasarkan ID, kembalikan -1 jika tidak ada
     int cariVendorByID(string id){
 
@@ -149,7 +105,6 @@ public:
     }
 
     // Tampilan ringkas 3 kolom (ID, Nama Toko, Pemilik)
-    // dipakai oleh fitur Edit Vendor dan Hapus Vendor
     void tampilRingkasanVendor(){
 
         cout<<"\n========================================================\n";
