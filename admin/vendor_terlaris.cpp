@@ -7,16 +7,7 @@ class VendorTerlaris{
 
 private:
     string namaToko[10]={
-        "Toko Makmur",
-        "Game Store",
-        "Tech Store",
-        "FashionKu",
-        "Healthy Shop",
-        "ATK Jaya",
-        "Pet House",
-        "Baby Mart",
-        "Sport Center",
-        "Otomotif Jaya"
+      "Toko Makmur", "Game Store", "Tech Store", "FashionKu", "Healthy Shop", "ATK Jaya", "Pet House", "Baby Mart", "Sport Center", "Otomotif Jaya"
     };
 
     int transaksi[10]={
