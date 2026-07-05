@@ -25,21 +25,12 @@ private:
     };
 
     string kategori[10]={
-        "Sembako","Gaming","Elektronik","Fashion","Kesehatan",
-        "Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
+        "Sembako","Gaming","Elektronik","Fashion","Kesehatan","Alat Tulis","Hewan","Bayi","Olahraga","Otomotif"
+        
     };
 
     string email[10]={
-        "andi@gmail.com",
-        "budi@gmail.com",
-        "citra@gmail.com",
-        "dewi@gmail.com",
-        "eko@gmail.com",
-        "farhan@gmail.com",
-        "gilang@gmail.com",
-        "hasan@gmail.com",
-        "indra@gmail.com",
-        "joko@gmail.com"
+        "andi@gmail.com","budi@gmail.com","citra@gmail.com","dewi@gmail.com","eko@gmail.com","farhan@gmail.com","gilang@gmail.com","hasan@gmail.com","indra@gmail.com","joko@gmail.com"
     };
 
     string noHp[10]={
