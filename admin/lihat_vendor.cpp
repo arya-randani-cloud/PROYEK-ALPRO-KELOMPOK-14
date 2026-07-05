@@ -26,21 +26,12 @@ private:
     };
 
     string status[10]={
-        "Aktif",
-        "Aktif",
-        "Aktif",
-        "Aktif",
-        "Aktif",
-        "Aktif",
-        "Nonaktif",
-        "Aktif",
-        "Nonaktif",
-        "Aktif"
+       "Aktif","Aktif","Aktif","Aktif","Aktif","Aktif","Nonaktif","Aktif","Nonaktif","Aktif"
     };
 
     int produk[10]={
-        35,28,40,25,18,
-        20,15,16,22,19
+        35,28,40,25,18,20,15,16,22,19
+        
     };
 
     float rating[10]={
