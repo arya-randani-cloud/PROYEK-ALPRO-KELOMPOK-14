@@ -2,11 +2,14 @@
 =======================================
           PEMBAGIAN TUGAS :
          MENU AWAL CERANMALL
-    1.PELANGGAN   :L.M ARYA
-    2.TOKO/VENDOR :MUH YAZID
-    3.ADMIN MALL  :HAIDAN HAMMAM 
 =======================================
 
+
+=======================================
+1.PELANGGAN   :L.M ARYA
+2.TOKO/VENDOR :MUH YAZID
+3.ADMIN MALL  :HAIDAN HAMMAM 
+=======================================
 
     
 1. Akun Pelanggan (Database User)
