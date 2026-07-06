@@ -1462,11 +1462,11 @@ int main(){
         switch(pilih){
 
         case 1:
-            cout<<"\nMenu Pelanggan akan dibuat oleh anggota kelompok lain.\n";
+            cout<<"\nMenu Pelanggan akan dibuat oleh anggota lain.\n";
             break;
 
         case 2:
-            cout<<"\nMenu Vendor akan dibuat oleh anggota kelompok lain.\n";
+            cout<<"\nMenu Vendor akan dibuat oleh anggota lain.\n";
             break;
 
         case 3:
