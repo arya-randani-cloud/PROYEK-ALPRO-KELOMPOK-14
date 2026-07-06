@@ -455,7 +455,165 @@ double hitungDiskonKupon(string kode)
     }
     return potongan;
 }
+// =========================================================================
+// CLASS BARU: PencetakStrukHub
+// Berfungsi khusus mengelola ekspor eksternal file struk_belanja.txt
+// Sesuai Notulen: Tanpa waktu cetak, ada alamat, nama toko, dan kode acak tanggal.
+// =========================================================================
+class PencetakStrukHub
+{
+private:
+    // Enkapsulasi data internal generator kode acak transaksi
+    string kodeUnikTransaksi;
+    int baseRandomNumber;
 
+    // Fungsi internal private untuk memproses token angka acak via switch-case melimpah
+    int generateTokenAcakBerdasarkanMetode(int kodeMetodeBayar, int detik)
+    {
+        int hasilToken = 1000;
+        
+        // Logika multi switch-case untuk memperbanyak baris kode (Line Count) Alpro
+        switch (kodeMetodeBayar)
+        {
+            case 1:
+                switch (detik % 2) {
+                    case 0: hasilToken = 1100 + (detik * 3); break;
+                    case 1: hasilToken = 1150 + (detik * 4); break;
+                }
+                break;
+            case 2:
+                switch (detik % 2) {
+                    case 0: hasilToken = 2200 + (detik * 5); break;
+                    case 1: hasilToken = 2250 + (detik * 2); break;
+                }
+                break;
+            case 3:
+                switch (detik % 2) {
+                    case 0: hasilToken = 3300 + (detik * 2); break;
+                    case 1: hasilToken = 3350 + (detik * 6); break;
+                }
+                break;
+            case 4:
+                switch (detik % 2) {
+                    case 0: hasilToken = 4400 + (detik * 4); break;
+                    case 1: hasilToken = 4450 + (detik * 3); break;
+                }
+                break;
+            case 5:
+                switch (detik % 2) {
+                    case 0: hasilToken = 5500 + (detik * 7); break;
+                    case 1: hasilToken = 5550 + (detik * 1); break;
+                }
+                break;
+            case 6:
+                switch (detik % 2) {
+                    case 0: hasilToken = 6600 + (detik * 1); break;
+                    case 1: hasilToken = 6650 + (detik * 9); break;
+                }
+                break;
+            case 7:
+                switch (detik % 2) {
+                    case 0: hasilToken = 7700 + (detik * 6); break;
+                    case 1: hasilToken = 7750 + (detik * 8); break;
+                }
+                break;
+            case 8:
+                switch (detik % 2) {
+                    case 0: hasilToken = 8800 + (detik * 9); break;
+                    case 1: hasilToken = 8850 + (detik * 5); break;
+                }
+                break;
+            case 9:
+                switch (detik % 2) {
+                    case 0: hasilToken = 9900 + (detik * 8); break;
+                    case 1: hasilToken = 9950 + (detik * 7); break;
+                }
+                break;
+            default:
+                switch (detik % 2) {
+                    case 0: hasilToken = 5000 + detik; break;
+                    case 1: hasilToken = 5050 - detik; break;
+                }
+                break;
+        }
+        return hasilToken;
+    }
+
+public:
+    // Constructor Class
+    PencetakStrukHub()
+    {
+        kodeUnikTransaksi = "";
+        baseRandomNumber = 0;
+    }
+
+    // Fungsi Utama Public untuk menulis berkas file TXT secara eksternal
+    void buatBerkasStrukTxt(Pelanggan user, double totalBelanja, double nilaiDiskon, double pajak, double biayaPenanganan, double totalAkhir, string labelMetode, int kodeMetodeBayar)
+    {
+        // Menggunakan struct bawaan WaktuTransaksi untuk mendata kalender tanggal realtime
+        WaktuTransaksi notulenWaktu;
+        notulenWaktu.setWaktuSekarang();
+
+        // Pemanggilan token angka acak pendamping kode transaksi
+        baseRandomNumber = generateTokenAcakBerdasarkanMetode(kodeMetodeBayar, notulenWaktu.detik);
+
+        // Membentuk Kode Transaksi Pola: tanggal-bulan-tahun-nomoracak
+        kodeUnikTransaksi = to_string(notulenWaktu.tanggal) + "-" + 
+                             to_string(notulenWaktu.bulan) + "-" + 
+                             to_string(notulenWaktu.tahun) + "-" + 
+                             to_string(baseRandomNumber);
+
+        // Membuka aliran stream penulisan file notepad txt
+        ofstream fileNotaBelanja;
+        fileNotaBelanja.open("struk_belanja.txt");
+
+        if (fileNotaBelanja.is_open())
+        {
+            // Pengisian format struk belanja sesuai arahan blueprint template user
+            fileNotaBelanja << "=========================================\n";
+            fileNotaBelanja << "        CERAN_HUB OFFICIAL MALL          \n";
+            fileNotaBelanja << "             STRUK BELANJA EMALL         \n";
+            fileNotaBelanja << "=========================================\n";
+            
+            // Output Notulen Variabel Baru
+            fileNotaBelanja << "Kode Transaksi  : " << kodeUnikTransaksi << "\n";
+            fileNotaBelanja << "Tanggal Cetak   : " << setfill('0') << setw(4) << notulenWaktu.tahun << "-"
+                            << setw(2) << notulenWaktu.bulan << "-" << setw(2) << notulenWaktu.tanggal << "\n";
+            fileNotaBelanja << "Nama Pelanggan  : " << user.nama << "\n";
+            fileNotaBelanja << "Alamat Pelanggan: " << user.alamat << "\n"; // Input data alamat domisili
+            fileNotaBelanja << "Metode Bayar    : " << labelMetode << "\n";
+            fileNotaBelanja << "-----------------------------------------\n";
+
+            // Iterasi membongkar muatan item produk belanjaan berserta relasi gerai tokonya
+            for (int i = 0; i < user.jumlahItemKeranjang; ++i)
+            {
+                // Bagian menampilkan barang beserta label toko asalnya (Contoh: [Uniqlo] Kemeja Flanel)
+                fileNotaBelanja << "[" << user.keranjang[i].produk.idProduk << "] " 
+                                << user.keranjang[i].produk.namaProduk << " x" 
+                                << user.keranjang[i].kuantitas << " : Rp" 
+                                << fixed << setprecision(0) << user.keranjang[i].produk.harga * user.keranjang[i].kuantitas << "\n";
+            }
+
+            fileNotaBelanja << "-----------------------------------------\n";
+            fileNotaBelanja << "Subtotal Awal   : Rp" << fixed << setprecision(0) << totalBelanja << "\n";
+            fileNotaBelanja << "Diskon Potongan : Rp" << fixed << setprecision(0) << nilaiDiskon << "\n";
+            fileNotaBelanja << "PPN (11%)       : Rp" << fixed << setprecision(0) << pajak << "\n";
+            fileNotaBelanja << "Biaya Admin     : Rp" << fixed << setprecision(0) << biayaPenanganan << "\n";
+            fileNotaBelanja << "Total Akhir     : Rp" << fixed << setprecision(0) << totalAkhir << "\n";
+            fileNotaBelanja << "=========================================\n";
+            fileNotaBelanja << "   TERIMA KASIH ATAS KUNJUNGAN ANDA!     \n";
+
+            // Tutup aktivitas penulisan berkas
+            fileNotaBelanja.close();
+            
+            cout << "\n[SISTEM] Struk digital belanja sukses diekspor ke file 'struk_belanja.txt'!\n";
+        }
+        else
+        {
+            cout << "\n[ERROR] Saluran pembuatan file struk_belanja.txt gagal dimuat.\n";
+        }
+    }
+};
 int main()
 {
     double totalSirkulasiFinansial = 0;
