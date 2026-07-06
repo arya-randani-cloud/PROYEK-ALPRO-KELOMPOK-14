@@ -1446,7 +1446,7 @@ int main(){
     int pilih;
 
     do{
-
+        cout<<"\033[31m"<<endl;
         cout<<"\n====================================\n";
         cout<<"   SELAMAT DATANG DI CERANMALL\n";
         cout<<"====================================\n";
@@ -1455,6 +1455,7 @@ int main(){
         cout<<"3. Admin Mall\n";
         cout<<"4. Keluar\n";
         cout<<"====================================\n";
+        cout<<"\033[0m"<<endl;
 
         cout<<"Pilih Menu : ";
         cin>>pilih;
