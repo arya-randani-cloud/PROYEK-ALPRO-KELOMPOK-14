@@ -1,0 +1,16 @@
+=========================================
+        CERAN_HUB OFFICIAL MALL          
+             STRUK BELANJA EMALL         
+=========================================
+Nama Pelanggan  : Budi Santoso
+Metode Bayar    : Direct Bank VA
+-----------------------------------------
+Kemeja Flanel x1 : Rp399000
+-----------------------------------------
+Subtotal Awal   : Rp399000
+Diskon Potongan : Rp0
+PPN (11%)       : Rp43890
+Biaya Admin     : Rp2500
+Total Akhir     : Rp445390
+=========================================
+   TERIMA KASIH ATAS KUNJUNGAN ANDA!     
