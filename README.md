@@ -7,11 +7,10 @@
 
 
 
-            MENU AWAL
-1.PELANGGAN   :L.M ARYA
-2.TOKO/VENDOR :MUH YAZID
-3.ADMIN MALL  :HAIDAN HAMMAM 
-=======================================
+Menu Awal 
+1.Pelanggan/User : L.M Arya
+2.Toko/Vendor    : Muh Yazid
+3.Admin Mall     : Haidan Hammam 
 
     
 1. Akun Pelanggan (Database User)
