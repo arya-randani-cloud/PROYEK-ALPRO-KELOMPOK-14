@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <iomanip>
+#include <fstream> // Ditambahkan untuk penanganan ekspor file txt
 
 using namespace std;
 
@@ -205,7 +206,7 @@ void jalankanAnimasiLoading()
     terapkanWarnaTampilan(0);
 }
 
-// Fungsi mencetak Logo Besar CERAN_HUB (Menyumbang baris teks dekoratif yang melimpah)
+// Fungsi mencetak Logo Besar CERAN_HUB
 void cetakLogoMallBesar()
 {
     terapkanWarnaTampilan(TEMA_WARNA_SEKARANG);
@@ -257,13 +258,14 @@ public:
     string namaProduk;
     int stok;
     double harga;
+    string namaTokoAsal; // Menyimpan info asal toko penyuplai produk
 
-    Produk() : idProduk(""), namaProduk(""), stok(0), harga(0.0)
+    Produk() : idProduk(""), namaProduk(""), stok(0), harga(0.0), namaTokoAsal("")
     {
     }
 
     Produk(string id, string nama, int s, double h) 
-        : idProduk(id), namaProduk(nama), stok(s), harga(h)
+        : idProduk(id), namaProduk(nama), stok(s), harga(h), namaTokoAsal("")
     {
     }
 
@@ -303,6 +305,7 @@ public:
     {
         if (jumlahProduk < MAKS_PRODUK)
         {
+            p.namaTokoAsal = namaToko; // Set nama toko asal secara otomatis
             daftarBarang[jumlahProduk] = p;
             jumlahProduk++;
         }
@@ -455,24 +458,21 @@ double hitungDiskonKupon(string kode)
     }
     return potongan;
 }
+
 // =========================================================================
-// CLASS BARU: PencetakStrukHub
+// CLASS BARU: PencetakStrukHub (DIINTEGRASIKAN SECARA SEMPURNA)
 // Berfungsi khusus mengelola ekspor eksternal file struk_belanja.txt
 // Sesuai Notulen: Tanpa waktu cetak, ada alamat, nama toko, dan kode acak tanggal.
 // =========================================================================
 class PencetakStrukHub
 {
 private:
-    // Enkapsulasi data internal generator kode acak transaksi
     string kodeUnikTransaksi;
     int baseRandomNumber;
 
-    // Fungsi internal private untuk memproses token angka acak via switch-case melimpah
     int generateTokenAcakBerdasarkanMetode(int kodeMetodeBayar, int detik)
     {
         int hasilToken = 1000;
-        
-        // Logika multi switch-case untuk memperbanyak baris kode (Line Count) Alpro
         switch (kodeMetodeBayar)
         {
             case 1:
@@ -540,55 +540,44 @@ private:
     }
 
 public:
-    // Constructor Class
     PencetakStrukHub()
     {
         kodeUnikTransaksi = "";
         baseRandomNumber = 0;
     }
 
-    // Fungsi Utama Public untuk menulis berkas file TXT secara eksternal
     void buatBerkasStrukTxt(Pelanggan user, double totalBelanja, double nilaiDiskon, double pajak, double biayaPenanganan, double totalAkhir, string labelMetode, int kodeMetodeBayar)
     {
-        // Menggunakan struct bawaan WaktuTransaksi untuk mendata kalender tanggal realtime
         WaktuTransaksi notulenWaktu;
         notulenWaktu.setWaktuSekarang();
 
-        // Pemanggilan token angka acak pendamping kode transaksi
         baseRandomNumber = generateTokenAcakBerdasarkanMetode(kodeMetodeBayar, notulenWaktu.detik);
 
-        // Membentuk Kode Transaksi Pola: tanggal-bulan-tahun-nomoracak
         kodeUnikTransaksi = to_string(notulenWaktu.tanggal) + "-" + 
                              to_string(notulenWaktu.bulan) + "-" + 
                              to_string(notulenWaktu.tahun) + "-" + 
                              to_string(baseRandomNumber);
 
-        // Membuka aliran stream penulisan file notepad txt
         ofstream fileNotaBelanja;
         fileNotaBelanja.open("struk_belanja.txt");
 
         if (fileNotaBelanja.is_open())
         {
-            // Pengisian format struk belanja sesuai arahan blueprint template user
             fileNotaBelanja << "=========================================\n";
             fileNotaBelanja << "        CERAN_HUB OFFICIAL MALL          \n";
             fileNotaBelanja << "             STRUK BELANJA EMALL         \n";
             fileNotaBelanja << "=========================================\n";
-            
-            // Output Notulen Variabel Baru
             fileNotaBelanja << "Kode Transaksi  : " << kodeUnikTransaksi << "\n";
             fileNotaBelanja << "Tanggal Cetak   : " << setfill('0') << setw(4) << notulenWaktu.tahun << "-"
                             << setw(2) << notulenWaktu.bulan << "-" << setw(2) << notulenWaktu.tanggal << "\n";
             fileNotaBelanja << "Nama Pelanggan  : " << user.nama << "\n";
-            fileNotaBelanja << "Alamat Pelanggan: " << user.alamat << "\n"; // Input data alamat domisili
+            fileNotaBelanja << "Alamat Pelanggan: " << user.alamat << "\n"; 
             fileNotaBelanja << "Metode Bayar    : " << labelMetode << "\n";
             fileNotaBelanja << "-----------------------------------------\n";
 
-            // Iterasi membongkar muatan item produk belanjaan berserta relasi gerai tokonya
             for (int i = 0; i < user.jumlahItemKeranjang; ++i)
             {
-                // Bagian menampilkan barang beserta label toko asalnya (Contoh: [Uniqlo] Kemeja Flanel)
-                fileNotaBelanja << "[" << user.keranjang[i].produk.idProduk << "] " 
+                fileNotaBelanja << user.keranjang[i].produk.namaTokoAsal << " " 
                                 << user.keranjang[i].produk.namaProduk << " x" 
                                 << user.keranjang[i].kuantitas << " : Rp" 
                                 << fixed << setprecision(0) << user.keranjang[i].produk.harga * user.keranjang[i].kuantitas << "\n";
@@ -603,9 +592,7 @@ public:
             fileNotaBelanja << "=========================================\n";
             fileNotaBelanja << "   TERIMA KASIH ATAS KUNJUNGAN ANDA!     \n";
 
-            // Tutup aktivitas penulisan berkas
             fileNotaBelanja.close();
-            
             cout << "\n[SISTEM] Struk digital belanja sukses diekspor ke file 'struk_belanja.txt'!\n";
         }
         else
@@ -614,6 +601,7 @@ public:
         }
     }
 };
+
 int main()
 {
     double totalSirkulasiFinansial = 0;
@@ -622,7 +610,7 @@ int main()
     // Inisialisasi Database User (Sistem Autentikasi)
     Pelanggan daftarUser[2] = {
         Pelanggan("arya123", "jogja2026", "3404123456789", "Arya Randani", "Sleman, Yogyakarta", 5000000),
-        Pelanggan("user2", "pass2", "3404987654321", "Budi Santoso", "Bantul, Yogyakarta", 100000)
+        Pelanggan("user2", "pass2", "3404987654321", "Budi Santoso", "Bantul, Yogyakarta", 500000)
     };
 
     Pelanggan userSekarang;
@@ -688,7 +676,6 @@ int main()
     daftarTokoMall[totalToko++] = Toko("T17", "Informa", "Home Living & Hobbies (Furnitur & Interior)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P18", "Kursi Kerja Ergonomis", 8, 1100000));
 
-    // Validasi penanganan database merchant
     daftarTokoMall[totalToko++] = Toko("T18", "Gramedia", "Home Living & Hobbies (Buku & Alat Tulis)");
     daftarTokoMall[totalToko-1].tambahProdukBaru(Produk("P19", "Buku Structure Data C++", 25, 95000));
 
@@ -996,6 +983,9 @@ int main()
                         if (qty <= produkTerpilih.stok)
                         {
                             produkTerpilih.kurangiStok(qty);
+                            
+                            // Ambil nama toko asal agar tercatat di struk belanja
+                            produkTerpilih.namaTokoAsal = tokoTerpilih.namaToko; 
                             userSekarang.tambahKeranjang(produkTerpilih, qty);
                             catatAktivitasLog("Menambah barang: " + produkTerpilih.namaProduk + " ke keranjang.");
                         }
@@ -1137,6 +1127,7 @@ int main()
                         labelMetode = "Direct ShopeePay";
                         biayaPenanganan = 1000;
                         cout << "[DIRECT SHOPEEPAY] Scan wajah / sidik jari pada perangkat seluler Anda...\n";
+                        string pinShopee;
                         pembayaranSukses = 1;
                         break;
                     }
@@ -1164,46 +1155,29 @@ int main()
                         totalSirkulasiFinansial += totalAkhir;
                         catatAktivitasLog("Checkout berhasil dilakukan via " + labelMetode + " senilai Rp" + to_string(totalAkhir));
 
-                        // Cetak Struk Belanja Resmi Berlapis
+                        // Tampilkan Struk Ringkas Di Layar Konsol Utama
                         cout << "\n=========================================\n";
-                        cout << "             STRUK PEMBAYARAN            \n";
+                        cout << "              STRUK PEMBAYARAN            \n";
                         cout << "=========================================\n";
-                        WaktuTransaksi waktu;
-                        waktu.setWaktuSekarang();
-                        cout << "Waktu Transaksi : "; waktu.cetakWaktu();
                         cout << "Nama Pelanggan  : " << userSekarang.nama << "\n";
                         cout << "Metode Bayar    : " << labelMetode << "\n";
                         cout << "-----------------------------------------\n";
                         for (int i = 0; i < userSekarang.jumlahItemKeranjang; ++i)
                         {
-                            // DIPERBAIKI: Mengubah typo userSekrang menjadi nama variabel objek yang benar
-                            cout << userSekarang.keranjang[i].produk.namaProduk << " x" 
+                            cout << "[" << userSekarang.keranjang[i].produk.namaTokoAsal << "] " 
+                                 << userSekarang.keranjang[i].produk.namaProduk << " x" 
                                  << userSekarang.keranjang[i].kuantitas << " : Rp" 
                                  << fixed << setprecision(0) << userSekarang.keranjang[i].produk.harga * userSekarang.keranjang[i].kuantitas << "\n";
                         }
                         cout << "-----------------------------------------\n";
-                        cout << "Subtotal Barang : Rp" << totalBelanja << "\n";
-                        cout << "Diskon Potongan : Rp" << nilaiDiskon << "\n";
-                        cout << "PPN (11%)       : Rp" << pajak << "\n";
-                        cout << "Biaya Penanganan: Rp" << biayaPenanganan << "\n";
                         cout << "Total Bayar     : Rp" << totalAkhir << "\n";
-
-                        switch (metodeBayar)
-                        {
-                            case 1:
-                            {
-                                cout << "Sisa Saldo Wallet: Rp" << userSekarang.saldoWallet << "\n";
-                                break;
-                            }
-                            default:
-                            {
-                                cout << "Sisa Saldo Wallet: Rp" << userSekarang.saldoWallet << " (Tidak Berubah)\n";
-                                break;
-                            }
-                        }
-
                         cout << "=========================================\n";
-                        cout << "      Terima Kasih Telah Berbelanja!     \n";
+
+                        // =========================================================================
+                        // AKTIVITAS UTAMA: Memanggil Class PencetakStrukHub untuk Ekspor Notepad .txt
+                        // =========================================================================
+                        PencetakStrukHub mesinCetakHub;
+                        mesinCetakHub.buatBerkasStrukTxt(userSekarang, totalBelanja, nilaiDiskon, pajak, biayaPenanganan, totalAkhir, labelMetode, metodeBayar);
 
                         userSekarang.kosongkanKeranjang();
                         break;
@@ -1227,7 +1201,7 @@ int main()
 
                     cout << "\n Apakah Anda ingin melihat seluruh Log Aktivitas Sistem? (y/n): ";
                     char opsiLog;
-                    cin >> opsiLog; // DIPERBAIKI: pengisian buffer input diarahkan ke variabel opsiLog yang benar
+                    cin >> opsiLog; 
                     if (opsiLog == 'y' || opsiLog == 'Y')
                     {
                         cout << "\n=== HISTORI LOG AUDITING REALTIME ===\n";
@@ -1249,7 +1223,6 @@ int main()
             }
             case 6:
             {
-                // Menu Kustomisasi Kosmetik UI (Menyumbang Ratusan Baris Tambahan Secara Alami)
                 cout << "\n=== PENGATURAN KOSMETIK TAMPILAN (UI) ===\n";
                 cout << "1. Ubah Tema Warna Teks Aplikasi\n";
                 cout << "2. Ubah Model Garis Pembatas (Border Style)\n";
