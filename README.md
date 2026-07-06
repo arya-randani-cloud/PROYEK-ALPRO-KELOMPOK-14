@@ -1,4 +1,14 @@
 # PROYEK-ALPRO-KELOMPOK-14
+=======================================
+          PEMBAGIAN TUGAS :
+         MENU AWAL CERANMALL
+    1.PELANGGAN   :L.M ARYA
+    2.TOKO/VENDOR :MUH YAZID
+    3.ADMIN MALL  :HAIDAN HAMMAM 
+=======================================
+
+
+    
 1. Akun Pelanggan (Database User)
 Terdapat 2 akun pelanggan yang diinisialisasi secara manual pada baris daftarUser[2]:
 
