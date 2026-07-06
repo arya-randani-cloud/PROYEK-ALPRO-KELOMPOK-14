@@ -1,11 +1,13 @@
 # PROYEK-ALPRO-KELOMPOK-14
 =======================================
           PEMBAGIAN TUGAS :
-         MENU AWAL CERANMALL
 =======================================
 
 
-=======================================
+
+
+
+            MENU AWAL
 1.PELANGGAN   :L.M ARYA
 2.TOKO/VENDOR :MUH YAZID
 3.ADMIN MALL  :HAIDAN HAMMAM 
