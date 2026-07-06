@@ -1389,7 +1389,7 @@ void menuAdminMall(){
     int pilih;
 
     do{
-
+        cout<<"\033[32m"<<endl;
         cout<<"\n====================================\n";
         cout<<"            ADMIN MALL\n";
         cout<<"====================================\n";
@@ -1404,6 +1404,7 @@ void menuAdminMall(){
         cout<<"9. Pengaturan Sistem\n";
         cout<<"0. Logout\n";
         cout<<"====================================\n";
+        cout<<"\033[0m";
 
         cout<<"Pilih Menu : ";
         cin>>pilih;
