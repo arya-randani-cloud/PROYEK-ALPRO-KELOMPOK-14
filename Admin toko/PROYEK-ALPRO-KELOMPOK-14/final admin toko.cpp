@@ -578,13 +578,13 @@ void menuUtamaAdmin() {
     cout << " 8. Update Stok Pemasukan (Restock Toko)\n";
     cout << " 9. Update Stok Pengeluaran (Jual/Retur Barang)\n";
     // --- FITUR BARU ---
-    cout << "10. Sistem Logistik & Pengiriman \033[1;32m(NEW)\033[0m\n";
-    cout << "11. Manajemen Suplier / Pemasok \033[1;32m(NEW)\033[0m\n";
-    cout << "12. SDM & Manajemen Karyawan \033[1;32m(NEW)\033[0m\n";
-    cout << "13. Sistem Retur Barang (RMA) \033[1;32m(NEW)\033[0m\n";
-    cout << "14. Customer Service / Komplain \033[1;32m(NEW)\033[0m\n";
-    cout << "15. Sistem Promosi & Voucher \033[1;32m(NEW)\033[0m\n";
-    cout << "16. Analitik & Laporan Lanjut \033[1;32m(NEW)\033[0m\n";
+    cout << "10. Sistem Logistik & Pengiriman\n";
+    cout << "11. Manajemen Suplier / Pemasok\n";
+    cout << "12. SDM & Manajemen Karyawan\n";
+    cout << "13. Sistem Retur Barang (RMA)\n";
+    cout << "14. Customer Service / Komplain\n";
+    cout << "15. Sistem Promosi & Voucher\n";
+    cout << "16. Analitik & Laporan Lanjut\n";
     cout << "17. Logout Kendali\n";
     cetakGaris(65, '-');
     cout << "Pilih menu: "; cin >> pilihan;
