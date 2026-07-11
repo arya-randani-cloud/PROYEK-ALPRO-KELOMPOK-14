@@ -36,3 +36,4 @@ Untuk mengakses Menu 5 (Menu Admin / Audit Keuangan), sistem tidak meminta usern
 ID Admin: ADM01
 
 Kunci Keamanan (Password): CERAN2026
+RoleContoh akunTampilan yang munculUserarya123 / jogja2026, atau user2 / pass2Menu belanja pelanggan (modPelanggan) + sistem pemesanan cepat (modPemesanan)Adminadmin01 / ceran2026adminLangsung ke Dashboard Admin Mall (modVendor::menuAdminMall)Tokoadmin / admin123, atau toko01 / toko2026Menu registrasi toko baru (modAddAdmin) + dashboard toko lengkap (modAdminFinal)
