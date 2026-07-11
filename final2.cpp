@@ -1,7 +1,7 @@
 // ==========================================
 //      CLASS UTAMA: SISTEM E-COMMERCE MALL
 // ==========================================
-class SistemECommerceMall {
+class TampilanAdmin{
 private:
     // ==========================================
     //          DATABASE SIMULASI STATIS (ARRAY)
@@ -1814,3 +1814,4 @@ public:
         }
     }
 };
+
