@@ -35,5 +35,40 @@ Untuk mengakses Menu 5 (Menu Admin / Audit Keuangan), sistem tidak meminta usern
 
 ID Admin: ADM01
 
-Kunci Keamanan (Password): CERAN2026
-RoleContoh akunTampilan yang munculUser arya123 / jogja2026, atau user2 / pass2 Menu belanja pelanggan (modPelanggan) + sistem pemesanan cepat (modPemesanan) Adminadmin01 / ceran2026 adminLangsung ke Dashboard Admin Mall (modVendor::menuAdminMall) Tokoadmin / admin123, atau toko01 / toko2026 registrasi toko baru (modAddAdmin) + dashboard toko lengkap (modAdminFinal)
+# 🛒 Sistem Manajemen E-Commerce & Multi-Vendor
+
+Repositori ini berisi implementasi sistem e-commerce multi-vendor berbasis modular. Sistem ini dirancang untuk memisahkan hak akses dan alur kerja antara **Pelanggan (Customer)**, **Pemilik Toko (Vendor/Admin Toko)**, dan **Pengelola Pusat (Super Admin/Admin Mall)**.
+
+---
+
+## 🔐 Kredensial Akun & Hak Akses (Demo)
+
+Untuk keperluan pengujian dan demonstrasi fitur, berikut adalah modul dan tampilan yang akan muncul berdasarkan akun yang digunakan saat login.
+
+> 🔑 **Kunci Keamanan Sistem (Password Utama):** `CERAN2026`
+
+| Peran (Role) | Username | Password | Tampilan / Modul yang Muncul |
+| :--- | :--- | :--- | :--- |
+| **Pelanggan** | `arya123`<br>`user2` | `jogja2026`<br>`pass2` | Halaman utama belanja pelanggan (`modPelanggan`) & Fitur sistem pemesanan cepat (`modPemesanan`). |
+| **Admin Mall** | `admin01` | `ceran2026admin` | Langsung diarahkan ke Dashboard Utama Admin Mall (`modVendor::menuAdminMall`). |
+| **Toko (Vendor)** | `tokoadmin`<br>`toko01` | `admin123`<br>`toko2026` | Menu registrasi toko baru (`modAddAdmin`) & Dashboard pengelolaan toko lengkap (`modAdminFinal`). |
+
+---
+
+## 🛠️ Arsitektur Modul
+
+Proyek ini dibangun menggunakan pendekatan modular untuk memastikan kode tetap bersih dan mudah dikembangkan:
+
+*   **`modPelanggan`**: Menangani antarmuka pengguna, katalog produk, dan pengalaman belanja pelanggan.
+*   **`modPemesanan`**: Mengelola sistem *fast-checkout* dan pemrosesan pesanan secara instan.
+*   **`modVendor`**: Modul inti untuk manajemen multi-vendor, termasuk fungsi khusus `menuAdminMall` untuk pengelola pusat.
+*   **`modAddAdmin`**: Alur khusus untuk pendaftaran toko baru dan verifikasi data vendor.
+*   **`modAdminFinal`**: Dashboard komprehensif bagi pemilik toko untuk memantau produk, stok, dan laporan penjualan.
+
+---
+
+## 🚀 Cara Memulai
+
+1. Clone repositori ini:
+   ```bash
+   git clone [https://github.com/username/repository-name.git](https://github.com/username/repository-name.git)
