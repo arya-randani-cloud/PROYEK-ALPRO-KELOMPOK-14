@@ -1815,9 +1815,9 @@ public:
     }
 };
 // ==========================================
-//      CLASS UTAMA: SISTEM MALL METROPOLIS
+//      CLASS UTAMA: TAMPILAN USER
 // ==========================================
-class SistemMallMetropolis {
+class TampilanUser {
 private:
     // ==========================================
     //       VARIABEL & LOG SUBSISTEM KOSMETIK
